@@ -270,3 +270,10 @@ Install colorama for colored console output:
 ### These files can optionally be installed as well, provide path through command arguments:
 * [Glove Vectors](https://nlp.stanford.edu/data/glove.6B.zip) (~2.25 GB)
 * [Google News Vectors](https://drive.google.com/file/d/0B7XkCwpI5KDYNlNUTTlSS21pQmM/edit) (~3.5 GB)
+
+
+## OpenAI GPT Agent
+
+* Open gpt_manager.py and add your OpenAI API key near the top of the file where it says "Enter Your API key here".
+* After this, you should be able to use the codemaster_gpt and guesser_gpt agents.
+* For example, running "python run_game.py players.codemaster_gpt.AICodemaster players.guesser_gpt.AIGuesser" will perform a single round game between both GPT agents.
