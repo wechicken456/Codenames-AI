@@ -1,11 +1,16 @@
 # Codenames AI Competition Framework
 
-This is the Codenames AI Competition Framework.  The purpose of this framework is to enable an AI competition for the game "Codenames" by Vlaada Chvatil.  There are large number of AI competitions built around games (and even more platforms using games as a testbed for AI), but with few exceptions these have focused on things that AI is likely to be good at (fine, pixel-perfect control or search through a large state space).  The purpose of this competition is to test AI in a framework that:
+This is the main repository for the (new and revised) Codenames AI Competition Framework, focussed on the development of LLM powered agents to play the word association game "Codenames" by Vlaada Chvatil. The purpose of this competition is to test AI in a framework that:
 
 * Requires the understanding of language
 * Requires communication, in a semantically meaningful way, with players of unknown provenance --  the player on the other side of the table may be a human or it may be another, unaffiliated, bot
 * Requires understanding words with multiple meanings
 
+This competition and the code in this repository are based on the original Codenames AI competition (https://github.com/CodenamesAICompetition/Game), but with the following major modifications:
+
+* The game rules have been altered to more closely represent those of the original game, with the largest modification being that the two teams now compete against each other, with each team consisting of a Codemaster and Guesser agent.
+* A renewed emphasis on utilising the capabilities of LLMs (such as GPT-4, Gemini, Claude or Llama) to idenftify suitable clues and guesses. More traditional Codenames game-playing techniques (such as utilising word vector embeddings) are also applicable, either alongisde LLM models or as a stand-alone techniques. However, the emphasis with this new competition will be on agents that are able to handle new and previously unseen wordsets, and agents who are able to play effecively alongside wide range of potential teammates.
+  
 **Further installation requirements are found below.**
 
 ## Submissions
