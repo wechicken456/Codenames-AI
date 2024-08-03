@@ -149,18 +149,18 @@ Players are split into two teams (red and blue), with each team consisting of a 
 
 At the start of the game, the board consists of 25 English words:
 
-DAY SLIP SPINE WAR CHICK
-FALL HAND WALL AMAZON DEGREE
-GIANT CENTAUR CLOAK STREAM CHEST
-HAM DOG EMBASSY GRASS FLY
+DAY SLIP SPINE WAR CHICK\
+FALL HAND WALL AMAZON DEGREE\
+GIANT CENTAUR CLOAK STREAM CHEST\
+HAM DOG EMBASSY GRASS FLY\
 CAPITAL OIL COLD HOSPITAL MARBLE
 
 The Codemasters on each team has access to a hidden map that tells them the identity of all of the words (Red, Blue, Civilian or Assassin).
 
-*Red* *Red* *Civilian* *Assassin* *Red*
-*Red* *Civilian* *Red* *Blue* *Civilian*
-*Blue* *Civilian* *Civilian* *Red* *Civilian*
-*Blue* *Blue* *Civilian* *Blue* *Red*
+*Red* *Red* *Civilian* *Assassin* *Red*\
+*Red* *Civilian* *Red* *Blue* *Civilian*\
+*Blue* *Civilian* *Civilian* *Red* *Civilian*\
+*Blue* *Blue* *Civilian* *Blue* *Red*\
 *Red* *Civilian* *Red* *Blue* *Red*
 
 The Guessers on each team do not have access to this map, and so do not know the identity of any words.
