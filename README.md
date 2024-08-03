@@ -22,25 +22,13 @@ Entrants in the competition will be able to submit up to two bots (at most 1 Cod
 To run the game, the terminal will require a certain amount of arguments.
 Where the order is:
 * args[0] = run_game.py
-* args[1] = package.MyCodemasterClass
-* args[2] = package.MyGuesserClass
+* args[1] = package.MyCodemasterRedClass
+* args[2] = package.MyGuesserRedClass
+* args[3] = package.MyCodemasterBlueClass
+* args[4] = package.MyGuesserBlueClass
 
 **run_game.py simply handles system arguments then called game.Game().
 See below for more details about calling game.Game() directly.**
-
-Optionally if certain word vectors are needed, the directory to which should be specified in the arguments here.
-5 argument parsers have been provided:
-* --w2v *path/to/word_vectors*
-  * (to be loaded by gensim)
-* --glove *path/to/glove_vectors*
-  *  (in stanford nlp format)
-* --wordnet ic-brown.dat or ic-semcor.dat
-  * (nltk corpus filename)
-
-* --glove_cm *path/to/glove_vectors*
-  * (legacy argument for glove_glove.py)
-* --glove_guesser *path/to/glove_vectors*
-  * (legacy argument for glove_glove.py)
 
 An optional seed argument can be used for the purpose of consistency against the random library.
 * --seed *Integer value* or "time"
@@ -54,11 +42,8 @@ Other optional arguments include:
 * --game_name *String*
   * game_name in logfile
 
-An example simulation of a *wordnet codemaster* and a *word2vec guesser* in the terminal from codenames/:  
-`$ python run_game.py players.codemaster_wn_lin.AICodemaster players.guesser_w2v.AIGuesser --seed 3442 --w2v players/GoogleNews-vectors-negative300.bin  --wordnet ic-brown.dat`
-
-An example of running glove codemaster and glove guesser with different glove vectors (removed glove_glove.py)
-`$ python run_game.py players.codemaster_glove_07.AICodemaster players.guesser_glove.AIGuesser --seed 3442 --glove_cm players/glove.6B.50d.txt --glove_guesser players/glove.6B.100d.txt`
+An example simulation of a game between two teams of GPT-4 codemasters and guessers in the terminal from codenames/:  
+`$ python run_game.py players.codemaster_GPT.AICodemaster players.guesser_GPT.AIGuesser players.codemaster_GPT.AICodemaster players.guesser_GPT.AIGuesser --seed 3442
 
 ## Running the game from calling Game(...).run()
 
@@ -66,14 +51,11 @@ The class Game() that can be imported from game.Game is the main framework class
 
 An example of calling generalized vector codemaster and guesser from python code rather than command line
 ```
-    cm_kwargs = {"vectors": [w2v, glove_50d, glove_100d], "distance_threshold": 0.3, "same_clue_patience": 1, "max_red_words_per_clue": 3}
-    g_kwargs = {"vectors": [w2v, glove_50d, glove_100d]}
-    Game(VectorCodemaster, VectorGuesser, seed=0, do_print=False,  game_name="vectorw2vglvglv03-vectorw2vglvglv", cm_kwargs=cm_kwargs, g_kwargs=g_kwargs).run()
+    Game(AICodemaster, AIGuesser, AICodemaster, AIGuesser, seed=seed, do_print=True, game_name="GPT-GPT").run()
 ```
 
-See simple_example.py for an example of sharing word vectors,
-passing kwargs to guesser/codemaster through Game,
-and calling Game.run() directly.
+See simple_example.py for an example of calling Game.run() directly.
+Arguments for custom Codemaster and Guesser classes can be provided using the cmr_kwargs, gr_kwargs, cmb_kwargs and gb_kwargs parameters.
 
 ## Game Class
 
@@ -87,10 +69,14 @@ Class that setups up game details and
 calls Guesser/Codemaster pair to play the game
 
 Args:
-    codemaster (:class:`Codemaster`):
-        Codemaster (spymaster in Codenames' rules) class that provides a clue.
-    guesser (:class:`Guesser`):
-        Guesser (field operative in Codenames' rules) class that guesses based on clue.
+    codemaster_red (:class:`Codemaster`):
+        Codemaster for red team (spymaster in Codenames' rules) class that provides a clue.
+    guesser_red (:class:`Guesser`):
+        Guesser for red team (field operative in Codenames' rules) class that guesses based on clue.
+    codemaster_blue (:class:`Codemaster`):
+        Codemaster for blue team (spymaster in Codenames' rules) class that provides a clue.
+    guesser_blue (:class:`Guesser`):
+        Guesser for blue team (field operative in Codenames' rules) class that guesses based on clue.
     seed (int or str, optional): 
         Value used to init random, "time" for time.time(). 
         Defaults to "time".
@@ -102,10 +88,14 @@ Args:
         Defaults to True.
     game_name (str, optional): 
         game name used in log file. Defaults to "default".
-    cm_kwargs (dict, optional): 
-        kwargs passed to Codemaster.
-    g_kwargs (dict, optional): 
-        kwargs passed to Guesser.
+    cmr_kwargs (dict, optional):
+        kwargs passed to red Codemaster.
+    gr_kwargs (dict, optional):
+        kwargs passed to red Guesser.
+    cmb_kwargs (dict, optional):
+        kwargs passed to blue Codemaster.
+    gb_kwargs (dict, optional):
+        kwargs passed to blue Guesser.
 ```
 
 ## Codemaster Class
@@ -152,7 +142,10 @@ get_answer() -> Str
 
 ## Rules of the Game
 
-Codenames is a game of language understanding and communication.  The competition takes place in a single team style of play -- The Codemaster and Guesser are both on the Red team, and their goal is to discover their words as quickly as possible, while minimizing the number of incorrect guesses.
+Codenames is a word-based game of language understanding and communication.
+Players are split into two teams (red and blue), with each team consisting of a Codemaster and Guesser. Each team's goal is to discover their colour words as quickly as possible, while minimizing the number of incorrect guesses.
+
+### Setup:
 
 At the start of the game, the board consists of 25 English words:
 
@@ -162,54 +155,48 @@ GIANT CENTAUR CLOAK STREAM CHEST
 HAM DOG EMBASSY GRASS FLY
 CAPITAL OIL COLD HOSPITAL MARBLE
 
-The Codemaster has access to a hidden map that tells them the identity of all of the words:
+The Codemasters on each team has access to a hidden map that tells them the identity of all of the words (Red, Blue, Civilian or Assassin).
 
 *Red* *Red* *Civilian* *Assassin* *Red*
-*Red* *Civilian* *Red* *Civilian* *Civilian*
-*Civilian* *Civilian* *Civilian* *Blue* *Civilian*
-*Red* *Civilian* *Red* *Red*
+*Red* *Civilian* *Red* *Blue* *Civilian*
+*Blue* *Civilian* *Civilian* *Red* *Civilian*
+*Blue* *Blue* *Civilian* *Blue* *Red*
+*Red* *Civilian* *Red* *Blue* *Red*
 
-Meaning that the words that Codemaster wants their teammate to guess are:
+The Guessers on each team do not have access to this map, and so do not know the identity of any words.
+Players need to work as a team to select their words as quickly as possible, while minimizing the number of incorrect guesses.
+For example, the red team's guesser needs to select the following words:
 
-DAY, SLIP, CHICK, FALL, WALL, CAPITAL, HOSPITAL, MARBLE
+DAY, SLIP, CHICK, FALL, WALL, STREAM, FLY, CAPITAL, MARBLE
 
-The Codemaster then supplies a clue and a number (the number of guesses the Guesser is obligated to make):
+### Turns:
+
+At the start of each team's turn, the Codemaster supplies a clue and a number (the number of words related to that clue).
 
 e.g., `('pebble',2)`
 
 The clue must:
-* Be semantically related to what the Codemaster wants their guesser to guess -- no using words to tell the position of the words
+* Be semantically related to what the Codemaster wants their guesser to guess -- i.e. no using words to tell the position of the words
 * Be a single English word
-* NOT be derived from or derive one of the words on the board -- i.e. days or cloaked are not valid clues
+* NOT be derived from or derive one of the words on the board -- i.e. days or cloaked are not valid clues. *Note, in our code we enforce through a strict string sub-word check. However, this can be circumnavigated by providing words that are spelt incorrectly or contain additional characters. For competition purposes, human judges will be used to ensure that provided clues stick to this rule, and repeated violations will result in disqualification.*
 
-The guesser then returns a list of their guesses, in order of importance:
+The Guesser then selects from the remaining words on he board, based on the which words are most associated with the Codemaster's clue.
 
-e.g. `['MARBLE', 'STREAM']`
+e.g. `'MARBLE'`
 
-This would result in them guessing 1 word correctly -- MARBLE -- and guessing one that is linked to a civilian -- STREAM.  If instead the guesser had guessed:
+The identity of the selected word is then revealed to all players.
+If the Guesser selected a word that is their team's colour, then they may get to pick another word.
+The Guesser must always make at least one guess each turn, and can guess up to one word more than the number provided in the Codemaster's clue.
+If a Guesser selects a word that is not their team's colour, their turn ends.
+The Guesser can choose to stop selecting words (ending their turn) any time after the first guess.
 
-`['STREAM', 'MARBLE']`
+###Ending:
 
-Then the result would be in 1 incorrect guess -- STREAM -- and their turn would have ended at that point.  It is important for the guesser to correctly order their guesses, as ordering is important.
+Play proceeds, passing back and forth, until one of three outcomes is achieved:
 
-If a guesser guesses an invalid clue, their turn is forfeit.
-
-Play proceeds, passing back and forth, until one of 3 outcomes is achieved:
-
-* All of the Red tiles have been found -- the team wins
-* All of the Blue tiles have been found -- the team loses
-* The single *Assassin* tile is found -- the team loses
-
-## Competition Rules
-
-Competition results will be scored by the number of turns required to guess all 8 red words. Scores will be calculated in an inverse proportional fashion, so the lower the better. 
-
-* The average number of turns the codemaster/guesser takes will be the score given to each paired bot.
-* Guessing an assassin-linked word or the 7 blue words before all 8 red words will result in an instant loss and a score of 25 turns or points.
-
-Codemaster bots will be swapped and trialed with multiple guessers and conversely guesser bots will be swapped with codemasters to ensure and maximize variability and fairness.
-
-In other words you'll be paired up with other player's bots, and scored/tested to see how well your AI can perform within a more general context of Natural Language Understanding.
+* All of the words of your team's colour have been selected -- you win
+* All of the words of the other team's colour have been selected -- you lose
+* You select the assassin tile -- you lose
 
 ## Prerequisite: Installation and Downloads
 Note: The installation of the [Anaconda Distribution](https://www.anaconda.com/distribution/) should be used for certain dependencies to work without issues. Also installing NLTK and gensim through conda is much simpler and less time consuming than the below alternatives.
@@ -226,6 +213,7 @@ Example installation order:
 >>> nltk.download('all')
 >>> exit()
 (codenames) pip install -U colorama
+(codenames) pip install -U openai
 (codenames) git clone https://github.com/CodenamesAICompetition/Game.git
 (codenames) cd codenames
 ```
@@ -270,6 +258,9 @@ python
 
 Install colorama for colored console output:
 ```pip install -U colorama```
+
+Install openAI Python API:
+```pip install -U openai```
 
 
 ## OpenAI GPT Agent
