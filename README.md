@@ -9,17 +9,28 @@ This is the main repository for the (new and revised) Codenames AI Competition F
 This competition and the code in this repository are based on the original Codenames AI competition (https://github.com/CodenamesAICompetition/Game), but with the following major modifications:
 
 * The game rules have been altered to more closely represent those of the original game, with the largest modification being that the two teams now compete against each other, with each team consisting of a Codemaster and Guesser agent.
-* A renewed emphasis on utilising the capabilities of LLMs (such as GPT-4, Gemini, Claude or Llama) to idenftify suitable clues and guesses. More traditional Codenames game-playing techniques (such as utilising word vector embeddings) are also applicable, either alongisde LLM models or as a stand-alone techniques. However, the emphasis with this new competition will be on agents that are able to handle new and previously unseen wordsets, and agents who are able to play effecively alongside wide range of potential teammates.
+* A renewed emphasis on utilising the capabilities of LLMs (such as GPT-4, Gemini, Claude or Llama) to identify suitable clues and guesses. More traditional Codenames game-playing techniques (such as utilising word vector embeddings) are also applicable, either alongside LLM models or as a stand-alone techniques. However, the emphasis with this new competition will be on agents that are able to handle new and previously unseen wordsets, and agents who are able to play effectively alongside wide range of potential teammates.
   
 **Further installation requirements are found below.**
 
 ## Submissions
 
-Entrants in the competition will be able to submit up to two bots (at most 1 Codemaster and 1 Guesser)
+Competition entrants will need to submit two agents, one Codemaster and one Guesser.
+
+Entrants will need to provide complete instructions for how to run their agents on the following hardware:
+* **Operating System:** Windows 11 or Ubuntu 24.04
+* **Processor:** AMD Ryzen Threadripper PRO 5955WX (64 MB cache, 16 cores, 32 threads, 4.0GHz to 4.5GHz, 280 W)
+* **Memory:** 256GB, 4x64GB, DDR4, 3200MHz, RDIMM ECC Memory
+* **Video Card:** NVIDIA® RTX™ A6000, 48 GB GDDR6, 4 DP
+* **Storage:** 100GB
+
+Entrants must ensure that both the submitted Codemaster and Guesser agent can run concurrently on the above hardware (i.e., available VRAM must be shared by both Codemaster and Guesser at the same time).
+
+Submitted agents may utilise external services (such as the openAI API utilised by the provided GPT agent) but entrants will need to ensure that any necessary keys and funds required for these services are provided for. 
 
 ## Running the game from terminal instructions
 
-To run the game, the terminal will require a certain amount of arguments.
+To run the game, the terminal will require a certain number of arguments.
 Where the order is:
 * args[0] = run_game.py
 * args[1] = package.MyCodemasterRedClass
@@ -42,14 +53,14 @@ Other optional arguments include:
 * --game_name *String*
   * game_name in logfile
 
-An example simulation of a game between two teams of GPT-4 codemasters and guessers in the terminal from codenames/:  
+An example simulation of a game between two teams of GPT-4 Codemasters and Guessers in the terminal from codenames/:  
 `$ python run_game.py players.codemaster_GPT.AICodemaster players.guesser_GPT.AIGuesser players.codemaster_GPT.AICodemaster players.guesser_GPT.AIGuesser --seed 3442
 
 ## Running the game from calling Game(...).run()
 
 The class Game() that can be imported from game.Game is the main framework class.
 
-An example of calling generalized vector codemaster and guesser from python code rather than command line
+An example of calling generalized vector Codemaster and guesser from python code rather than command line
 ```
     Game(AICodemaster, AIGuesser, AICodemaster, AIGuesser, seed=seed, do_print=True, game_name="GPT-GPT").run()
 ```
@@ -109,7 +120,7 @@ get_clue() -> Tuple[str,int]
 
 '__init__' **kwargs are passed through.  These arguments are not currently used by the default GPT agents, but the option to use them for developing your own agents is still provided.
 
-`set_game_state` is passed the list of words on the board, as well as the key grid provided to spymasters (codemasters).  The `words` are either: an all upper case word found in the English language or one of 4 special tokens: `'*Red*', '*Blue*', '*Civilian*', '*Assassin*'` indicating that the word that was originally at that location has been guessed and been found to be of that type.  The `key_grid` is a list of `'*Red*', '*Blue*', '*Civilian*', '*Assassin*'` indicating whether a spot on the board is on the team of the codemaster (`'*Red*'`), the opposing team (`'*Blue*'`), a civilian (`'*Civilian*'`), or the assassin (`'*Assassin*'`).
+`set_game_state` is passed the list of words on the board, as well as the key grid provided to spymasters (codemasters).  The `words` are either: an upper-case word found in the English language or one of 4 special tokens: `'*Red*', '*Blue*', '*Civilian*', '*Assassin*'` indicating that the word that was originally at that location has been guessed and been found to be of that type.  The `key_grid` is a list of `'*Red*', '*Blue*', '*Civilian*', '*Assassin*'` indicating whether a spot on the board is on the team of the codemaster (`'*Red*'`), the opposing team (`'*Blue*'`), a civilian (`'*Civilian*'`), or the assassin (`'*Assassin*'`).
 
 
 `get_clue` returns a tuple containing the clue, a single English word, and the number of words the Codemaster intends it to cover.
@@ -128,11 +139,11 @@ get_answer() -> Str
 
 #### *details*
 
-`__init__` is as above with the codemaster.
+`__init__` is as above with the Codemaster.
 
 `set_board` is passed the list of words on the board.  The `words` are either: an all upper case word found in the English language or one of 4 special tokens: `'*Red*', '*Blue*', '*Civilian*', '*Assassin*'` indicating that the word that was originally at that location has been guessed and been found to be of that type.
 
-`set_clue` is passed the clue and the number of guesses it covers, as supplied by the `get_clue` of the codemaster through the Game class.
+`set_clue` is passed the clue and the number of guesses it covers, as supplied by the `get_clue` of the Codemaster through the Game class.
 
 `keep_guessing` is a function that the game engine checks to see if the bot chooses to keep guessing, as the bot must only make at least one guess, but may choose to guess until it has gone to the number supplied by get_clue + 1.
 
@@ -211,12 +222,12 @@ Example installation order:
 (codenames) cd Codenames_GPT
 ```
 
-Alternatively you can use your system's packaging system. (*apt-get* on Debian, or *MacPorts/Homebrew* on macOS)
+Alternatively, you can use your system's packaging system. (*apt-get* on Debian, or *MacPorts/Homebrew* on macOS)
 Or just use Python's packaging system, pip3, which is included by default from the Python binary installer.
 
 
 ## OpenAI GPT Agent
 
-* Open gpt_manager.py and add your OpenAI API key near the top of the file where it says "ENTER YOUR API KEY HERE".
+* Open gpt_manager.py and add your OpenAI API key near the top of the file where it says, "ENTER YOUR API KEY HERE".
 * After this, you should be able to use the codemaster_GPT and guesser_GPT agents.
 * For example, running "python simple_example.py" will perform a single game between both GPT agents.
