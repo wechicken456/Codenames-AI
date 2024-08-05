@@ -107,7 +107,7 @@ get_clue() -> Tuple[str,int]
 ```
 #### *details*
 
-'__init__' **kwargs are passed through (can be used to pass pre-loaded word vectors to reduce load times for common NLP resources).  Some common examples are the Brown Corpus from NLTK's wordnet, the multi-dimensional GloVe vectors, and the 300 dimensional pre-trained Google NewsNewsBin word2vec vectors.
+'__init__' **kwargs are passed through.  These arguments are not currently used by the default GPT agents, but the option to use them for developing your own agents is still provided.
 
 `set_game_state` is passed the list of words on the board, as well as the key grid provided to spymasters (codemasters).  The `words` are either: an all upper case word found in the English language or one of 4 special tokens: `'*Red*', '*Blue*', '*Civilian*', '*Assassin*'` indicating that the word that was originally at that location has been guessed and been found to be of that type.  The `key_grid` is a list of `'*Red*', '*Blue*', '*Civilian*', '*Assassin*'` indicating whether a spot on the board is on the team of the codemaster (`'*Red*'`), the opposing team (`'*Blue*'`), a civilian (`'*Civilian*'`), or the assassin (`'*Assassin*'`).
 
@@ -199,19 +199,12 @@ Play proceeds, passing back and forth, until one of three outcomes is achieved:
 * You select the assassin tile -- you lose
 
 ## Prerequisite: Installation and Downloads
-Note: The installation of the [Anaconda Distribution](https://www.anaconda.com/distribution/) should be used for certain dependencies to work without issues. Also installing NLTK and gensim through conda is much simpler and less time consuming than the below alternatives.
+Note: The installation of the [Anaconda Distribution](https://www.anaconda.com/distribution/) should be used for certain dependencies to work without issues.
 
 Example installation order:
 ```
 (base) conda create --name codenames python=3.6
 (base) conda activate codenames
-(codenames) conda install gensim
-(codenames) pip install -U gensim
-(codenames) pip install -U nltk
-(codenames) python
->>> import nltk
->>> nltk.download('all')
->>> exit()
 (codenames) pip install -U colorama
 (codenames) pip install -U openai
 (codenames) git clone https://github.com/CodenamesAICompetition/Game.git
@@ -220,41 +213,6 @@ Example installation order:
 
 Alternatively you can use your system's packaging system. (*apt-get* on Debian, or *MacPorts/Homebrew* on macOS)
 Or just use Python's packaging system, pip3, which is included by default from the Python binary installer.
-
-To check that everything is installed without error type in a terminal:  
-`$ python3 -c "import scipy, numpy, gensim.models.keyedvectors, argparse, importlib, nltk, nltk.corpus, nltk.stem"`
-
-Installing Gensim:
-
-* Using Anaconda:
-```conda install gensim```
-
-* For Windows User using Conda Prompt(as well as the command on top):
-```pip install -U gensim```
-
-* For macOS, using Anaconda(same as above) or easy_install:
-```sudo easy_install --upgrade gensim```
-
-Installation of NLTK on macOS/linux:
-* Install python3 on your operation system. If python 2 and python 3 coexists in your Operating System than you must specify `python3` for your commands.
-* For macOS users, who don't have `pip3` or `python3` recognized in terminal, simply open terminal and type in `brew install python3` and check to see if `pip3` is a recognized command. If it is move on to the next step, if not type `brew postinstall python3`, or alternatively visit the [Python](https://python.org) website.
-* Type in `sudo pip3 install -U nltk`
-* Finally type in terminal (this installs all nltk packages, as opposed to a select few):
-```
-python
->>> import nltk
->>> nltk.download('all')
-```
-
-*Note for Windows user: Use the conda bash prompt for general purpose testing/running (as opposed to git bash)*
-
-Installation of NLTK on Windows:
-```pip install -U nltk```
-```
-python
->>> import nltk
->>> nltk.download('all')
-```
 
 Install colorama for colored console output:
 ```pip install -U colorama```
