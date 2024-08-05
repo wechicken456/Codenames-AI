@@ -19,7 +19,7 @@ Competition entrants will need to submit two agents, one Codemaster and one Gues
 
 Entrants will need to provide complete instructions for how to run their agents on the following hardware:
 * **Operating System:** Windows 11 or Ubuntu 24.04
-* **Processor:** AMD Ryzen Threadripper PRO 5955WX (64 MB cache, 16 cores, 32 threads, 4.0GHz to 4.5GHz, 280 W)
+* **Processor:** AMD Ryzen Threadripper PRO 5955WX (64 MB cache, 16 cores, 32 threads, 4.0GHz to 4.5GHz)
 * **Memory:** 256GB, 4x64GB, DDR4, 3200MHz, RDIMM ECC Memory
 * **Video Card:** NVIDIA® RTX™ A6000, 48 GB GDDR6, 4 DP
 * **Storage:** 100GB
