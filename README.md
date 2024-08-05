@@ -214,12 +214,6 @@ Example installation order:
 Alternatively you can use your system's packaging system. (*apt-get* on Debian, or *MacPorts/Homebrew* on macOS)
 Or just use Python's packaging system, pip3, which is included by default from the Python binary installer.
 
-Install colorama for colored console output:
-```pip install -U colorama```
-
-Install openAI Python API:
-```pip install -U openai```
-
 
 ## OpenAI GPT Agent
 
