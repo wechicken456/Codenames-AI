@@ -203,12 +203,12 @@ Note: The installation of the [Anaconda Distribution](https://www.anaconda.com/d
 
 Example installation order:
 ```
-(base) conda create --name codenames python=3.6
+(base) conda create --name codenames python=3.9
 (base) conda activate codenames
 (codenames) pip install -U colorama
 (codenames) pip install -U openai
-(codenames) git clone https://github.com/CodenamesAICompetition/Game.git
-(codenames) cd codenames
+(codenames) git clone https://github.com/stepmat/Codenames_GPT.git
+(codenames) cd Codenames_GPT
 ```
 
 Alternatively you can use your system's packaging system. (*apt-get* on Debian, or *MacPorts/Homebrew* on macOS)
