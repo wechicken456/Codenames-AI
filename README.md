@@ -49,9 +49,8 @@ Please take note of the following deadlines:
 * Date to submit final code / files for the competition.
   
 **Result Presentation:** 26-29 August 2025
-* Results will then be generated using submitted entries over the following two weeks before the CoG 2025 conference.
+* Results will be presented during the CoG 2025 conference.
 
-&nbsp;
 &nbsp;
 
 # Codenames AI Framework
