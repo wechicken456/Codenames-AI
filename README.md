@@ -10,8 +10,12 @@ This competition and the code in this repository are based on the original Coden
 
 * The game rules have been altered to more closely represent those of the original game, with the largest modification being that the two teams now compete against each other, with each team consisting of a Codemaster and Guesser agent.
 * A renewed emphasis on utilising the capabilities of LLMs (such as GPT-4, Gemini, Claude or Llama) to identify suitable clues and guesses. More traditional Codenames game-playing techniques (such as utilising word vector embeddings) are also applicable, either alongside LLM models or as a stand-alone techniques. However, the emphasis with this new competition will be on agents that are able to handle new and previously unseen wordsets, and agents who are able to play effectively alongside wide range of potential teammates.
-  
-**Further installation requirements are found below.**
+
+## Registration
+
+To register for this competition, please post a message on the following discord group stating your team name, along with details of the members and their affiliations.
+A separate private channel for your team will then be created for you to ask private questions to the organisers.
+Public questions or troubleshooting request should be posted on the main general channel.
 
 ## Submissions
 
@@ -27,6 +31,24 @@ Entrants will need to provide complete instructions for how to run their agents 
 Entrants must ensure that both the submitted Codemaster and Guesser agent can run concurrently on the above hardware (i.e., available VRAM must be shared by both Codemaster and Guesser at the same time).
 
 Submitted agents may utilise external services (such as the openAI API utilised by the provided GPT agent) but entrants will need to ensure that any necessary keys and funds required for these services are provided for. 
+
+## Key Dates
+
+Please take note of the following deadlines:
+
+**Registration Deadline: 31 July 2025
+* Date to register your interest in the competition
+**Submission for Testing Deadline:** 4 August 2025
+* Date to submit your files for testing purposes, the competition organisers will check that the code can be run successfully and provide feedback if not.
+* Entrants are not required to submit their files by this date, but will not receive any testing feedback if they do not.
+**Final Submission Deadline:** 11 August 2025
+* Date to submit final code / files for the competition.
+**Result Presentation:** 26-29 August 2025
+* Results will then be generated using submitted entries over the following two weeks before the CoG 2025 conference.
+
+
+  
+**Further installation requirements are found below.**
 
 ## Running the game from terminal instructions
 
