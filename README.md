@@ -1,4 +1,4 @@
-# Codenames AI Competition Framework
+# Codenames AI Competition
 
 This is the main repository for the (new and revised) Codenames AI Competition Framework, focussed on the development of LLM powered agents to play the word association game "Codenames" by Vlaada Chvatil. The purpose of this competition is to test AI in a framework that:
 
@@ -10,6 +10,8 @@ This competition and the code in this repository are based on the original Coden
 
 * The game rules have been altered to more closely represent those of the original game, with the largest modification being that the two teams now compete against each other, with each team consisting of a Codemaster and Guesser agent.
 * A renewed emphasis on utilising the capabilities of LLMs (such as GPT-4, Gemini, Claude or Llama) to identify suitable clues and guesses. More traditional Codenames game-playing techniques (such as utilising word vector embeddings) are also applicable, either alongside LLM models or as a stand-alone techniques. However, the emphasis with this new competition will be on agents that are able to handle new and previously unseen wordsets, and agents who are able to play effectively alongside wide range of potential teammates.
+  
+**Further installation requirements are found below.**
 
 ## Registration
 
@@ -50,8 +52,7 @@ Please take note of the following deadlines:
 * Results will then be generated using submitted entries over the following two weeks before the CoG 2025 conference.
 
 
-  
-**Further installation requirements are found below.**
+# Codenames AI Framework
 
 ## Running the game from terminal instructions
 
