@@ -38,11 +38,14 @@ Please take note of the following deadlines:
 
 **Registration Deadline:** 31 July 2025
 * Date to register your interest in the competition
+  
 **Submission for Testing Deadline:** 4 August 2025
 * Date to submit your files for testing purposes, the competition organisers will check that the code can be run successfully and provide feedback if not.
 * Entrants are not required to submit their files by this date, but will not receive any testing feedback if they do not.
+  
 **Final Submission Deadline:** 11 August 2025
 * Date to submit final code / files for the competition.
+  
 **Result Presentation:** 26-29 August 2025
 * Results will then be generated using submitted entries over the following two weeks before the CoG 2025 conference.
 
