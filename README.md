@@ -51,6 +51,7 @@ Please take note of the following deadlines:
 **Result Presentation:** 26-29 August 2025
 * Results will then be generated using submitted entries over the following two weeks before the CoG 2025 conference.
 
+&nbsp;
 
 # Codenames AI Framework
 
