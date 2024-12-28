@@ -15,7 +15,8 @@ This competition and the code in this repository are based on the original Coden
 
 ## Registration
 
-To register for this competition, please post a message on the following discord group stating your team name, along with details of the members and their affiliations.
+To register for this competition, please post a message on the following discord group stating your team name, along with details of the members and their affiliations:
+* https://discord.com/channels/1267428399400620063
 A separate private channel for your team will then be created for you to ask private questions to the organisers.
 Public questions or troubleshooting request should be posted on the main general channel.
 
