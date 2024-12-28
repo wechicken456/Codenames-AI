@@ -39,7 +39,7 @@ Submitted agents may utilise external services (such as the openAI API utilised 
 Please take note of the following deadlines:
 
 **Registration Deadline:** 31 July 2025
-* Date to register your interest in the competition
+* Date to register your interest in the competition.
   
 **Submission for Testing Deadline:** 4 August 2025
 * Date to submit your files for testing purposes, the competition organisers will check that the code can be run successfully and provide feedback if not.
