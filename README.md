@@ -45,8 +45,8 @@ The competition will consist of two separate tracks:
 
 Each submission will (unless otherwise requested by the entrants) be automatically included in both tracks, with the entrant evaluation process for both tracks being as follows:
 
-* **First Round:** The first round will consist of a round robin style tournament to evalate the performance of each entrant team. For the Single Team track, performance will be determined based on the average score over all games. For the Two Teams track, performance will be determined based on the average win-rate over all games. The top performing four teams from each track will then progress to the second round. Note. in the event of a tie, a single additional game will be played to break the split.
-* **Second Round:** The second round will consist of an single elimination style knockout tournament between the top four teams. Pair-ups will be determined by standard seeding (i.e., highest paired with lowest) and matches will be a best of three games.
+* **First Round:** The first round will consist of a round robin style tournament to evaluate the performance of each entrant team. For the Single Team track, performance will be determined based on the average score over all games. For the Two Teams track, performance will be determined based on the average win-rate over all games. The top performing four teams from each track will then progress to the second round. Note. in the event of a tie, a single additional game will be played to break the split.
+* **Second Round:** The second round will consist of a single elimination style knockout tournament between the top four teams. Pair-ups will be determined by standard seeding (i.e., highest paired with lowest) and matches will be a best of three games.
 
 ## Key Dates
 
