@@ -52,6 +52,7 @@ Please take note of the following deadlines:
 * Results will then be generated using submitted entries over the following two weeks before the CoG 2025 conference.
 
 &nbsp;
+&nbsp;
 
 # Codenames AI Framework
 
