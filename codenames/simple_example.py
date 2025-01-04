@@ -4,15 +4,15 @@ from players.codemaster_GPT import AICodemaster
 from players.guesser_GPT import AIGuesser
 
 
-def simpleExample():
+def simpleExample(single_team):
 
     print("\nclearing results folder...\n")
     Game.clear_results()
 
     seed = 0
 
-    print("starting GPT vs. GPT game")
-    Game(AICodemaster, AIGuesser, AICodemaster, AIGuesser, seed=seed, do_print=True, game_name="GPT-GPT").run()
+    print("starting GPT game")
+    Game(AICodemaster, AIGuesser, AICodemaster, AIGuesser, seed=seed, do_print=True, game_name="GPT-GPT", single_team=single_team).run()
 
     # display the results
     print(f"\nfor seed {seed} ~")
@@ -27,4 +27,5 @@ def simpleExample():
 
 
 if __name__ == "__main__":
-    simpleExample()
+    simpleExample(False)    # Two Teams Track
+    simpleExample(True)     # Single Team Track
