@@ -1,15 +1,15 @@
 # Codenames AI Competition
 
-This is the main repository for the (new and revised) Codenames AI Competition Framework, focussed on the development of LLM powered agents to play the word association game "Codenames" by Vlaada Chvatil. The purpose of this competition is to test AI in a framework that:
+This is the main repository for the (new and revised) Codenames AI Competition Framework, focussed on the development of LLM powered agents to play the word association game "Codenames" by Vlaada Chvatil. The purpose of this competition is to develop an AI benchmark that:
 
-* Requires the understanding of language
-* Requires communication, in a semantically meaningful way, with players of unknown provenance --  the player on the other side of the table may be a human or it may be another, unaffiliated, bot
-* Requires understanding words with multiple meanings
+* Requires an understanding of natural language.
+* Requires communication, in a semantically meaningful way, with players of unknown provenance - the player on the other side of the table may be a human or it may be another agent.
+* Requires an understanding of the multiple meanings and associations that words may have.
 
-This competition and the code in this repository are based on the original Codenames AI competition (https://github.com/CodenamesAICompetition/Game), but with the following major modifications:
+This competition and the code framework provided in this repository are based on the original Codenames AI competition (https://github.com/CodenamesAICompetition/Game), but with the following major modifications:
 
-* The game rules have been altered to more closely represent those of the original game, with the largest modification being that the two teams now compete against each other, with each team consisting of a Codemaster and Guesser agent.
-* A renewed emphasis on utilising the capabilities of LLMs (such as GPT-4, Gemini, Claude or Llama) to identify suitable clues and guesses. More traditional Codenames game-playing techniques (such as utilising word vector embeddings) are also applicable, either alongside LLM models or as a stand-alone techniques. However, the emphasis with this new competition will be on agents that are able to handle new and previously unseen wordsets, and agents who are able to play effectively alongside wide range of potential teammates.
+* The game rules have been altered to more closely represent those of the original game, with the largest modification being that it is now possible for two teams to compete against each other, with each team consisting of a Codemaster and Guesser agent.
+* A renewed emphasis on utilising the capabilities of LLMs (such as GPT-4, Gemini, Claude or Llama) to identify suitable clues and guesses. More traditional Codenames game-playing techniques (such as utilising word vector embeddings) are also applicable, either alongside LLM models or as a stand-alone technique. However, the emphasis with this new competition will be on agents that are able to handle new and previously unseen wordsets, and agents who are able to play effectively alongside wide range of potential teammates.
   
 **Further installation requirements are found below.**
 
@@ -19,7 +19,7 @@ To register for this competition, please post a message on the following discord
 * https://discord.com/channels/1267428399400620063
 
 A separate private channel for your team will then be created for you to ask private questions to the organisers.
-Public questions or troubleshooting request should be posted on the main general channel.
+Public questions or troubleshooting requests should be posted on the main general channel.
 
 ## Submissions
 
@@ -34,7 +34,7 @@ Entrants will need to provide complete instructions for how to run their agents 
 
 Entrants must ensure that both the submitted Codemaster and Guesser agent can run concurrently on the above hardware (i.e., available VRAM must be shared by both Codemaster and Guesser at the same time).
 
-Submitted agents may utilise external services (such as the openAI API utilised by the provided GPT agent) but entrants will need to ensure that any necessary keys and funds required for these services are provided for. 
+Submitted agents may utilise external services (such as the OpenAI API utilised by the provided GPT agent) but entrants will need to ensure that any necessary keys and funds required for these services are provided for. 
 
 ## Competition Format
 
