@@ -22,7 +22,8 @@ class Game:
 
     def __init__(self, codemaster_red, guesser_red, codemaster_blue, guesser_blue,
                  seed="time", do_print=True, do_log=True, game_name="default",
-                 cmr_kwargs={}, gr_kwargs={}, cmb_kwargs={}, gb_kwargs={}):
+                 cmr_kwargs={}, gr_kwargs={}, cmb_kwargs={}, gb_kwargs={},
+                 single_team=False)):
         """ Setup Game details
 
         Args:
@@ -53,6 +54,9 @@ class Game:
                 kwargs passed to blue Codemaster.
             gb_kwargs (dict, optional):
                 kwargs passed to blue Guesser.
+            single_team (bool, optional): 
+                Whether to play the single team track version. 
+                Defaults to False.
         """
 
         self.game_winner = None
@@ -76,6 +80,7 @@ class Game:
         self.gb_kwargs = gb_kwargs
         self.do_log = do_log
         self.game_name = game_name
+        self.single_team = single_team
 
         self.num_red_words = 9
         self.num_blue_words = 8
@@ -321,14 +326,9 @@ class Game:
                 if game_condition == game_condition_result:
                     print('\n' * 2)
                     self._display_board_codemaster()
-                    guess_num += 1
                     print("Keep Guessing? the clue is ", clue, clue_num)
                     keep_guessing = guesser.keep_guessing()
-                    # if guess_num <= clue_num:
-                    #     print("Keep Guessing? the clue is ", clue, clue_num)
-                    #     keep_guessing = guesser.keep_guessing()
-                    # else:
-                    #     keep_guessing = False
+
                     if not keep_guessing:
                         if game_condition == GameCondition.RED_TURN:
                             game_condition = GameCondition.BLUE_TURN
@@ -337,6 +337,10 @@ class Game:
                 else:
                     keep_guessing = False
                     game_condition = game_condition_result
+
+                # If playing single team version, then it is always the red team's turn.
+                if self.single_team and game_condition == GameCondition.BLUE_TURN:
+                    game_condition = GameCondition.RED_TURN
 
         if game_condition == GameCondition.RED_WIN:
             self.game_winner = "R"
