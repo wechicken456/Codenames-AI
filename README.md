@@ -56,7 +56,9 @@ Competition agents must abide the rules of Codenames regarding valid clues, and 
 * Using their clue to indicate the position of words to select rather than by language association (e.g., using the clue "Four-Two" to indicate the position of word(s)).
 * Using compound or misspelled words in their clue to provide additional information (e.g., using the clue "Bearbirdfox" to indicate multiple words).
 * Using non-English of foreign words for their clues.
+* 
 Full rules on valid clues can be found in the official game rulebook (https://czechgames.com/files/rules/codenames-rules-en.pdf). Agent clues will be reviewed by the competition organisers and any agents repeatedly breaking these rules or otherwise violating the spirit of the game will be disqualified.
+
 
 Whilst the framework provided uses the original pool of 395 possible words from Codenames, the competition will use an alternative pool of words. These words will not be provided to entrants beforehand and may potentially contain slang or other pop-culture terms that are not considered standard English words (e.g., "Hogwarts" or "Xenomorph"). This uncertainty in the set of final possible words will help ensure that agents have a sufficiently diverse understanding of language and are not merely memorising associations between a smaller set of known words.
 
