@@ -36,6 +36,8 @@ Entrants must ensure that both the submitted Codemaster and Guesser agent can ru
 
 Submitted agents may utilise external services (such as the OpenAI API utilised by the provided GPT agent) but entrants will need to ensure that any necessary keys and funds required for these services are provided for. 
 
+To encourage the use of open-source models, and to allow those who cannot afford external API services to still compete, we will award an additional special prize to the entrant that develops a solution that does not rely on external services.
+
 ## Competition Format
 
 The competition will consist of two separate tracks:
@@ -47,6 +49,16 @@ Each submission will (unless otherwise requested by the entrants) be automatical
 
 * **First Round:** The first round will consist of a round robin style tournament to evaluate the performance of each entrant team. For the Single Team track, performance will be determined based on the average score over all games. For the Two Teams track, performance will be determined based on the average win-rate over all games. The top performing four teams from each track will then progress to the second round. In the event of a tie, a single additional game will be played to break the split.
 * **Second Round:** The second round will consist of a single elimination style knockout tournament between the top four teams. Pair-ups will be determined by standard seeding (i.e., highest paired with lowest) and matches will be a best of three games.
+
+## Additional Rules
+
+Competition agents must abide the rules of Codenames regarding valid clues, and not attempt to manipulate the limitations of this framework in order to gain an unfair advantage. This includes, but is not limited to:
+* Using their clue to indicate the position of words to select rather than by language association (e.g., using the clue "Four-Two" to indicate the position of word(s)).
+* Using compound or misspelled words in their clue to provide additional information (e.g., using the clue "Bearbirdfox" to indicate multiple words).
+* Using non-English of foreign words for their clues.
+Full rules on valid clues can be found in the official game rulebook (https://czechgames.com/files/rules/codenames-rules-en.pdf). Agent clues will be reviewed by the competition organisers and any agents repeatedly breaking these rules or otherwise violating the spirit of the game will be disqualified.
+
+Whilst the framework provided uses the original pool of 395 possible words from Codenames, the competition will use an alternative pool of words. These words will not be provided to entrants beforehand and may potentially contain slang or other pop-culture terms that are not considered standard English words (e.g., "Hogwarts" or "Xenomorph"). This uncertainty in the set of final possible words will help ensure that agents have a sufficiently diverse understanding of language and are not merely memorising associations between a smaller set of known words.
 
 ## Key Dates
 
@@ -230,7 +242,7 @@ e.g., `('pebble',2)`
 The clue must:
 * Be semantically related to what the Codemaster wants their guesser to guess -- i.e. no using words to tell the position of the words
 * Be a single English word
-* NOT be derived from or derive one of the words on the board -- i.e. days or cloaked are not valid clues. *Note, in our code we enforce through a strict string sub-word check. However, this can be circumnavigated by providing words that are spelt incorrectly or contain additional characters. For competition purposes, human judges will be used to ensure that provided clues stick to this rule, and repeated violations will result in disqualification.*
+* NOT be derived from or derive one of the words on the board -- i.e. days or cloaked are not valid clues. *Note, in our code we enforce through a strict string sub-word check. However, this can be circumnavigated by providing words that are spelt incorrectly or  additional characters. For competition purposes, human judges will be used to ensure that provided clues stick to this rule, and repeated violations will result in disqualification.*
 
 The Guesser then selects from the remaining words on he board, based on the which words are most associated with the Codemaster's clue.
 
