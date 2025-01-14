@@ -1,5 +1,7 @@
 # Codenames AI Competition
 
+![image](https://github.com/user-attachments/assets/510cbaa5-a579-46a3-94c6-2cee11f60a7c)
+
 This is the main repository for the (new and revised) Codenames AI Competition Framework, focussed on the development of LLM powered agents to play the word association game "Codenames" by Vlaada Chvatil. The purpose of this competition is to develop an AI benchmark that:
 
 * Requires an understanding of natural language.
