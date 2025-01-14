@@ -10,7 +10,6 @@ class AIGuesser(Guesser):
         self.team = team
         self.num = 0
         self.guesses = 0
-
         system_prompt = game_rules + "You are playing the game Codenames as the " + team + " Guesser. "
         self.manager = GPT(system_prompt=system_prompt, version="gpt-4o-2024-05-13")
 
