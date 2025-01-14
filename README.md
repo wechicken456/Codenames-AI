@@ -167,6 +167,9 @@ Args:
         kwargs passed to blue Codemaster.
     gb_kwargs (dict, optional):
         kwargs passed to blue Guesser.
+    single_team (bool, optional): 
+        Whether to play the single team track version. 
+        Defaults to False.
 ```
 
 ## Codemaster Class
@@ -178,7 +181,7 @@ get_clue() -> Tuple[str,int]
 ```
 #### *details*
 
-'__init__' **kwargs are passed through.  These arguments are not currently used by the default GPT agents, but the option to use them for developing your own agents is still provided.
+`__init__` **kwargs are passed through.  These arguments are not currently used by the default GPT agents, but the option to use them for developing your own agents is still provided.
 
 `set_game_state` is passed the list of words on the board, as well as the key grid provided to spymasters (codemasters).  The `words` are either: an upper-case word found in the English language or one of 4 special tokens: `'*Red*', '*Blue*', '*Civilian*', '*Assassin*'` indicating that the word that was originally at that location has been guessed and been found to be of that type.  The `key_grid` is a list of `'*Red*', '*Blue*', '*Civilian*', '*Assassin*'` indicating whether a spot on the board is on the team of the codemaster (`'*Red*'`), the opposing team (`'*Blue*'`), a civilian (`'*Civilian*'`), or the assassin (`'*Assassin*'`).
 
@@ -187,7 +190,7 @@ get_clue() -> Tuple[str,int]
 
 ## Guesser Class
 
-Any Guesser bot is a python 3 class that derives from the supplied abstract base class Guesser in `guesser.py`.  The bot must implement four functions:
+Any Guesser bot is a python 3 class that derives from the supplied abstract base class Guesser in `guesser.py`.  The bot must implement five functions:
 
 ```
 __init__(self)
