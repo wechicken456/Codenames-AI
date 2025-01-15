@@ -40,9 +40,9 @@ Entrants will need to provide complete instructions for how to run their agents 
 * **Storage:** 100GB
 
 Entrants must ensure that both the submitted Codemaster and Guesser agent can run concurrently on the above hardware (i.e., available VRAM must be shared by both Codemaster and Guesser at the same time).
+Agents also need to provide a response when requested in a timely fashion, with a soft time limit of 60 seconds being imposed. Agents that repeatedly or egregiously breach this time limit when requested by the framework for a clue or guess response, will be disqualified.
 
 Submitted agents may utilise external services (such as the OpenAI API utilised by the provided GPT agent) but entrants will need to ensure that any necessary keys and funds required for these services are provided for. 
-
 To encourage the use of open-source models, and to allow those who cannot afford external API services to still compete, we will award an additional special prize to the entrant that develops a solution that does not rely on external services.
 
 ## Competition Format
@@ -67,6 +67,8 @@ Competition agents must abide the rules of Codenames regarding valid clues, and 
 * Using non-English of foreign words for their clues.
 
 Full rules on valid clues can be found in the official game rulebook (https://czechgames.com/files/rules/codenames-rules-en.pdf). Agent clues will be reviewed by the competition organisers and any agents repeatedly breaking these rules or otherwise violating the spirit of the game will be disqualified.
+
+It is also the entrant's responsibility to make sure that their submitted agents provide their responses in a valid format (e.g., the codemaster's clue contains both a word and a number, and the guesser selects a valid word on the board). Any agent that violates the required response format or causes an exception in the framework code will be disqualified.
 
 ### Word Pool
 
