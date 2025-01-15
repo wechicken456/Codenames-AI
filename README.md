@@ -27,6 +27,11 @@ Public questions or troubleshooting requests should be posted on the main genera
 
 Competition entrants will need to submit two agents, one Codemaster and one Guesser.
 
+We strongly encourage teams to submit these agents as single python files whenever possible, mimicking the layout and structure of the example codemaster_GPT.py and guesser_GPT.py files.
+The exact functions that submitted Codemaster and Guesser Classes much provide in order to function are specified in the **Codenames AI Framework** section below.
+Entrants may submit additional files if they are required, but should provide complete instructions / documentation for their usage.
+Entrants should not modify any of the other files provided as part of this framework.
+
 Entrants will need to provide complete instructions for how to run their agents on the following hardware:
 * **Operating System:** Windows 11 or Ubuntu 24.04
 * **Processor:** AMD Ryzen Threadripper PRO 5955WX (64 MB cache, 16 cores, 32 threads, 4.0GHz to 4.5GHz)
