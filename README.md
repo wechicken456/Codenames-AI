@@ -64,7 +64,7 @@ Each submission will (unless otherwise requested by the entrants) be automatical
 Competition agents must abide the rules of Codenames regarding valid clues, and not attempt to manipulate the limitations of this framework in order to gain an unfair advantage. This includes, but is not limited to:
 * Using their clue to indicate the position of words to select rather than by language association (e.g., using the clue "Four-Two" to indicate the position of word(s)).
 * Using compound or misspelled words in their clue to provide additional information (e.g., using the clue "Bearbirdfox" to indicate multiple words).
-* Using non-English of foreign words for their clues.
+* Using non-English or foreign words for their clues.
 
 Full rules on valid clues can be found in the official game rulebook (https://czechgames.com/files/rules/codenames-rules-en.pdf). Agent clues will be reviewed by the competition organisers and any agents repeatedly breaking these rules or otherwise violating the spirit of the game will be disqualified.
 
@@ -252,7 +252,7 @@ DAY, SLIP, CHICK, FALL, WALL, STREAM, FLY, CAPITAL, MARBLE
 
 ### Turns:
 
-At the start of each team's turn, the Codemaster supplies a clue and a number (the number of words related to that clue).
+At the start of each team's turn, the Codemaster supplies a clue and a number (the number of words related to that clue). Note that Codemasters can give "0" as their number, which allows guessers an unlimited number of guesses. 
 
 e.g., `('pebble',2)`
 
@@ -261,7 +261,7 @@ The clue must:
 * Be a single English word
 * NOT be derived from or derive one of the words on the board -- i.e. days or cloaked are not valid clues. *Note, in our code we enforce through a strict string sub-word check. However, this can be circumnavigated by providing words that are spelt incorrectly or  additional characters. For competition purposes, human judges will be used to ensure that provided clues stick to this rule, and repeated violations will result in disqualification.*
 
-The Guesser then selects from the remaining words on he board, based on the which words are most associated with the Codemaster's clue.
+The Guesser then selects from the remaining words on the board, based on which words are most associated with the Codemaster's clue.
 
 e.g. `'MARBLE'`
 
@@ -280,7 +280,7 @@ Play proceeds, passing back and forth, until one of three outcomes is achieved:
 * You select the assassin tile -- you lose
 
 ## Prerequisite: Installation and Downloads
-Note: The installation of the [Anaconda Distribution](https://www.anaconda.com/distribution/) should be used for certain dependencies to work without issues.
+Note: The installation of the [Anaconda Distribution](https://www.anaconda.com/download) should be used for certain dependencies to work without issues.
 
 Example installation order:
 ```
