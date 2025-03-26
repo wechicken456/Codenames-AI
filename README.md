@@ -18,7 +18,7 @@ This competition and the code framework provided in this repository are based on
 ## Registration
 
 To register for this competition, please post a message on the following discord group stating your team name, along with details of the members and their affiliations:
-* https://discord.com/channels/1267428399400620063
+* [Discord](https://discord.gg/uHUynQJp6r)
 
 A separate private channel for your team will then be created for you to ask private questions to the organisers.
 Public questions or troubleshooting requests should be posted on the main general channel.
