@@ -226,7 +226,7 @@ A shared move history has been added into the game framework, that both the Code
 To access this move history from inside your Codemaster or Guesser bot, simply call `super().get_move_history()`.
 This will return a list of all previous moves made for the game so far, from both the Red and Blue teams.
 * Codemaster moves are formatted as ["Colour_Codemaster", "Clue", "Number"], for example ['Red_Codemaster', 'TABLEWARE', 2].
-* Guesser moves are formatted as ["Colour_Guesser", "Answer", "Tile Identity", "Continue Guessing"], for example ['Red_Guesser', 'PLATE', '*Red*', True].
+* Guesser moves are formatted as ["Colour_Guesser", "Answer", "Tile Identity", "Continue Guessing"], for example ['Red_Guesser', 'PLATE', '*Assassin*', True].
 
 
 ## Rules of the Game
