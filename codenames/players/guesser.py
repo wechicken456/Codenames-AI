@@ -6,7 +6,16 @@ class Guesser(ABC):
 
     def __init__(self):
         """Handle pretrained vectors and declare instance vars"""
+        self.move_history = []
         pass
+
+    def set_move_history(self, move_history):
+        """Called periodically by the Game to update the current move history"""
+        self.move_history = move_history
+
+    def get_move_history(self):
+        """Called to access the current move history"""
+        return self.move_history
 
     @abstractmethod
     def set_board(self, words_on_board):
@@ -25,7 +34,7 @@ class Guesser(ABC):
 
     @abstractmethod
     def get_answer(self):
-        """Return the top guessed word based on the clue and current game board"""
+        """Return the guessed word based on the clue and current game board"""
         pass
 
 

@@ -87,6 +87,9 @@ class Game:
         self.num_civilian_words = 7
         self.num_assassin_words = 1
 
+        # Record of all moves previously made
+        self.move_history = []
+
         # set seed so that board/keygrid can be reloaded later
         if seed == 'time':
             self.seed = time.time()
@@ -183,6 +186,10 @@ class Game:
         """Return the codemaster's key"""
         return self.key_grid
 
+    def get_move_history(self):
+        """Return the move history"""
+        return self.move_history
+
     def _accept_guess(self, guess_index, game_condition):
         """Function that takes in an int index called guess to compare with the key grid
         """
@@ -231,7 +238,6 @@ class Game:
                 civ_result += 1
             elif self.words_on_board[i] == "*Assassin*":
                 assa_result += 1
-        total = red_result + blue_result + civ_result + assa_result
 
         if not os.path.exists("results"):
             os.mkdir("results")
@@ -283,10 +289,12 @@ class Game:
         while game_condition != GameCondition.BLUE_WIN and game_condition != GameCondition.RED_WIN:
 
             if game_condition == GameCondition.RED_TURN:
+                current_team = "Red"
                 codemaster = self.codemaster_red
                 guesser = self.guesser_red
                 print("RED TEAM TURN")
             else:
+                current_team = "Blue"
                 codemaster = self.codemaster_blue
                 guesser = self.guesser_blue
                 print("BLUE TEAM TURN")
@@ -295,15 +303,17 @@ class Game:
             print('\n' * 2)
             words_in_play = self.get_words_on_board()
             current_key_grid = self.get_key_grid()
+            move_history = self.get_move_history()
             codemaster.set_game_state(words_in_play, current_key_grid)
+            codemaster.set_move_history(move_history)
             self._display_key_grid()
             self._display_board_codemaster()
 
             # codemaster gives clue & number here
             clue, clue_num = codemaster.get_clue()
+            self.move_history.append([current_team+"_Codemaster", clue, clue_num])
             turn_counter += 1
             keep_guessing = True
-            guess_num = 0
             clue_num = int(clue_num)
 
             print('\n' * 2)
@@ -311,7 +321,9 @@ class Game:
 
             while keep_guessing:
 
+                move_history = self.get_move_history()
                 guesser.set_board(words_in_play)
+                guesser.set_move_history(move_history)
                 guess_answer = guesser.get_answer()
 
                 # if no comparisons were made/found than retry input from codemaster
@@ -320,14 +332,12 @@ class Game:
                 guess_answer_index = words_in_play.index(guess_answer.upper().strip())
                 game_condition_result = self._accept_guess(guess_answer_index, game_condition)
 
-                # print(game_condition)
-                # print(game_condition_result)
-
                 if game_condition == game_condition_result:
                     print('\n' * 2)
                     self._display_board_codemaster()
                     print("Keep Guessing? the clue is ", clue, clue_num)
                     keep_guessing = guesser.keep_guessing()
+                    self.move_history.append([current_team+"_Guesser", guess_answer, self.words_on_board[guess_answer_index], keep_guessing])
 
                     if not keep_guessing:
                         if game_condition == GameCondition.RED_TURN:
@@ -337,10 +347,12 @@ class Game:
                 else:
                     keep_guessing = False
                     game_condition = game_condition_result
+                    self.move_history.append([current_team+"_Guesser", guess_answer, self.words_on_board[guess_answer_index], False])
 
                 # If playing single team version, then it is always the red team's turn.
                 if self.single_team and game_condition == GameCondition.BLUE_TURN:
                     game_condition = GameCondition.RED_TURN
+
 
         if game_condition == GameCondition.RED_WIN:
             self.game_winner = "R"

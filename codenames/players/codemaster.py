@@ -6,7 +6,16 @@ class Codemaster(ABC):
 
     def __init__(self):
         """Set up word list and handle pretrained vectors"""
+        self.move_history = []
         pass
+
+    def set_move_history(self, move_history):
+        """Called periodically by the Game to update the current move history"""
+        self.move_history = move_history
+
+    def get_move_history(self):
+        """Called to access the current move history"""
+        return self.move_history
 
     @abstractmethod
     def set_game_state(self, words_on_board, key_grid):
