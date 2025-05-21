@@ -1,10 +1,13 @@
-from openai import OpenAI
+from transformers import AutoTokenizer, AutoModelForCausalLM 
 from dotenv import load_dotenv
-import os
+from dotenv import load_dotenv
+from huggingface_hub import login
+import os 
 
 load_dotenv()
-#openAI_api_key = "ENTER YOUR API KEY HERE"
-openAI_api_key = os.environ.get("OPENAI_API_KEY")
+login(token=os.environ.get("HUGGINGFACE_ACCESS_TOKEN"))
+
+
 # https://czechgames.com/files/rules/codenames-rules-en.pdf
 # Codemaster = Spymaster, Guesser = Field Operative
 game_rules = """
@@ -36,19 +39,30 @@ You select the assassin tile -- you lose
 """
 
 
-class GPT:
+class Qwen3:
 
     def __init__(self, system_prompt, version):
         super().__init__()
-        self.model_version = "o3-mini"
-        self.client = OpenAI(api_key=openAI_api_key)
+        version = "google/gemma-3-27b-it"
+        self.model_version = version 
+        self.tokenizer = AutoTokenizer.from_pretrained(version)
+        self.model = AutoModelForCausalLM.from_pretrained(version, device_map=0, torch_dtype="auto")
+       
         self.conversation_history = [{"role": "system", "content": system_prompt}]
 
     def talk_to_ai(self, prompt):
         self.conversation_history.append({"role": "user", "content": prompt})
-        response = self.client.chat.completions.create(
-            messages=self.conversation_history,
-            model=self.model_version,
-        ).choices[0].message.content
+        text = self.tokenizer.apply_chat_template(self.conversation_history, tokenize=False, add_generation_prompt=True)
+        inputs = self.tokenizer([text], return_tensors="pt").to(self.model.device)
+        outputs = self.model.generate(**inputs, max_new_tokens=8192) # outputs dim: (batch_size, input prompt len in tokens + output prompt len in tokens)
+        outputs = outputs[0][len(inputs.input_ids[0]):].tolist()   
+        # parsing thinking content
+        try:
+            # rindex finding 151668 (</think>)
+            index = len(output_ids) - output_ids[::-1].index(151668)
+        except ValueError:
+            index = 0
+        thinking_content = self.tokenizer.decode(outputs[:index], skip_special_tokens=True).strip("\n")
+        response = self.tokenizer.decode(outputs[:index], skip_special_tokens=True).strip("\n")
         self.conversation_history.append({"role": "assistant", "content": response})
         return response

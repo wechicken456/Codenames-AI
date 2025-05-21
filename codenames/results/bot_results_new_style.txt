@@ -1,0 +1,1 @@
+{"game_name": "GPT-Sample", "total_turns": 13, "R": 9, "B": 6, "C": 2, "A": 0, "codemaster_red": "AICodemaster", "guesser_red": "AIGuesser", "codemaster_blue": "AICodemaster", "guesser_blue": "AIGuesser", "seed": "1337", "winner": "R", "time_s": 468.49280834198, "cmr_kwargs": {}, "gr_kwargs": {}, "cmb_kwargs": {}, "gb_kwargs": {}}

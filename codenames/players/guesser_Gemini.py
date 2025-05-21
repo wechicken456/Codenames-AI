@@ -1,16 +1,18 @@
-from gpt_manager import game_rules, GPT
+from gemini_manager import game_rules, Gemini
 from players.guesser import Guesser
 import random
 import time
+
 
 class AIGuesser(Guesser):
 
     def __init__(self, team="Red"):
         super().__init__()
         self.team = team
-        self.opponent_team = "Blue" if self.team == "Red" else "Red"
+        self.opponent_team = "Blue" if team == "Red" else "Red"
         self.num = 0
         self.guesses = 0
+        # system_prompt = game_rules + "You are playing the game Codenames as the " + team + " Guesser. "
         system_prompt = f"""
 You are an expert AI Guesser for the game Codenames. Your goal is to accurately interpret your Codemaster's clue and select your team's words from the board.
 
@@ -66,7 +68,7 @@ Based on the clue "{{clue_word}}" (number: {{clue_number}}) and the current boar
         * Protecting a lead or avoiding the assassin is paramount.
         * Do not continue guessing if confidence drops significantly after your initial strong matches.
 4.  **Board Awareness & Risk Management:**
-    * **Assassin Avoidance:** Be cautious and don't provide any potential guesses that only has a remote plausible connection. If unsure, err on the side of safety.
+    * **Assassin Avoidance:** Be extremely cautious if any potential guess has even a remote plausible connection to concepts often associated with negative outcomes or abrupt endings (common assassin themes). If unsure, err on the side of safety.
     * **Opponent's Words & Neutrals:** Actively consider if a word linked to the clue might *also* be a strong fit for the opponent or a neutral word. Try to select words that are *distinctly* related to the clue in a way that your Codemaster likely intended for *your* team.
     * **Consider Revealed Words:** Revealed words (yours, opponent's, neutral) provide context. They might indicate patterns or rule out certain interpretations of clues.
 5.  **Infer Teammate & Opponent Tendencies (Advanced):**
@@ -75,9 +77,8 @@ Based on the clue "{{clue_word}}" (number: {{clue_number}}) and the current boar
 **Output Format:**
 From your ordered list of potential guesses, select the most confident word. Output it on a single line at the very end of your response. 
 ---
-You are playing the game Codenames as the {self.team} Guesser. Analyze the state of the board and the clue of the codemaster and provide your guess now."
 """
-        self.manager = GPT(system_prompt=system_prompt, version="o3-mini")
+        self.manager = Gemini(system_prompt=system_prompt, version="gemini-2.5-flash-preview-05-20")
 
     def set_board(self, words):
         self.words = words
@@ -88,20 +89,6 @@ You are playing the game Codenames as the {self.team} Guesser. Analyze the state
         print("The clue is:", clue, num)
         li = [clue, num]
         return li
-    def get_move_history_str(self) -> str:
-        move_history = ""
-        history = self.get_move_history()
-        for move in history:
-            if "Codemaster" in move[0]:
-                move_history += move[0] + "gives clue " + move[1] + ", " + str(move[2])
-            else:
-                move_history += move[0] + "gives guess the " + move[2] + " word " + move[1] + " and decided to "
-                if move[3] == True:
-                    move_history += "keep guessing"
-                else:
-                    move_history += "STOP guessing"
-            move_history += "\n"
-
 
     def keep_guessing(self):
         invalid_timer = 0
@@ -109,16 +96,14 @@ You are playing the game Codenames as the {self.team} Guesser. Analyze the state
         prompt = ""
         guess_again = False
         while response is None and self.guesses <= self.num:
-            if invalid_timer == 0:
-                prompt += "The remaining words are: " + str(self.get_remaining_options()) + ". "
-                prompt += f"Here is the move history of the game: f{self.get_move_history_str()}\n"
-                prompt += "The following is the Codemaster's clue: (" + str(self.clue) + ", " + str(self.num) + "). "
-                prompt += "You have picked " + str(self.guesses) + " words this turn. "
-                if self.guesses == self.num:
-                    prompt += "You can guess 1 more word, but you have already reached the clue number provided by the codemaster. It might be risky to guess once more."
-                prompt += "Analyze the remaining options and the state of the game based on the move history, and decide if you want to keep guessing."
-                prompt += "Would you like to keep guessing? Answer only 'yes' or 'no'. "
-            
+            prompt += "The remaining words are: " + str(self.get_remaining_options()) + ". "
+            prompt += f"Here is the move history of the game: f{self.get_move_history_str()}\n"
+            prompt += "The following is the Codemaster's clue: (" + str(self.clue) + ", " + str(self.num) + "). "
+            prompt += "You have picked " + str(self.guesses) + " words this turn. "
+            if self.guesses == self.num:
+                prompt += "You can guess 1 more word, but you have already reached the clue number provided by the codemaster. It might be risky to guess once more."
+            prompt += "Analyze the remaining options and the state of the game based on the move history, and decide if you want to keep guessing."
+            prompt += "Would you like to keep guessing? Answer only 'yes' or 'no'. "
             response = self.manager.talk_to_ai(prompt)
             if "yes" in response.lower():
                 guess_again = True
@@ -141,20 +126,36 @@ You are playing the game Codenames as the {self.team} Guesser. Analyze the state
             remaining_options.append(self.words[i])
         return remaining_options
 
+    def get_move_history_str(self) -> str:
+        move_history = ""
+        history = self.get_move_history()
+        for move in history:
+            if "Codemaster" in move[0]:
+                move_history += move[0] + "gives clue " + move[1] + ", " + str(move[2])
+            else:
+                move_history += move[0] + "gives guess the " + move[2] + " word " + move[1] + " and decided to "
+                if move[3] == True:
+                    move_history += "keep guessing"
+                else:
+                    move_history += "STOP guessing"
+            move_history += "\n"
+
     def get_answer(self):
         invalid_timer = 0
         guess = None
-        prompt = ""
+        prompt = f'**You are the {self.team} Guesser. The clue is "{self.clue}", and the clue number is {self.num}. Analyze the board and the move history of the game and provide your ordered list of guesses now.**'
         while guess is None:
-            if invalid_timer == 0:
-                prompt += "The remaining words are: " + str(self.get_remaining_options()) + ". "
-                prompt += "The following is the Codemaster's clue: (" + str(self.clue) + ", " + str(self.num) + "). "
-                prompt += "Select one of the remaining words that is most associated with this clue. "
-                prompt += "Feel free to think and reason. On the last line of your response, output your guess word."
+           
+            prompt += "The remaining words are: " + str(self.get_remaining_options()) + ". "
+            prompt += f"Here is the move history of the game: f{self.get_move_history_str()}\n"
+            prompt += "The following is the Codemaster's clue: (" + str(self.clue) + ", " + str(self.num) + "). "
+            prompt += "Using the proided guidelines your system prompt, select one of the remaining words that is most associated with this clue."
+            prompt += "Feel free to take time to think and reason. On the last line of your response, output the word you are most confident to guess as a single word."
             print("\n\n" + prompt + "\n\n")
             response = self.manager.talk_to_ai(prompt)
             print(response)
-            response = response.upper().split("\n")[-1].strip("\n")
+            response = response.split("\n")[-1]
+            response = response.upper().strip()
             if response in self.words:
                 guess = response
             elif response.split(" ")[0].strip() in self.words:
@@ -167,8 +168,9 @@ You are playing the game Codenames as the {self.team} Guesser. Analyze the state
                 print("You have made too many invalid guesses, selecting random remaining word")
                 guess = random.choice(self.get_remaining_options())
             else:
+                time.sleep(1)
                 print("Warning! Invalid guess: " + response)
-                prompt = "That was not a valid word. Your guess word must be one of the words on the board. Output it by itself on the very last line at the end of your response."
+                prompt = "That was not a valid word. "
                 invalid_timer += 1
         self.guesses += 1
         return guess

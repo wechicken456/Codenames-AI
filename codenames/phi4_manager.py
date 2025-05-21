@@ -1,10 +1,7 @@
-from openai import OpenAI
+from transformers import AutoTokenizer, AutoModelForCausalLM 
 from dotenv import load_dotenv
 import os
 
-load_dotenv()
-#openAI_api_key = "ENTER YOUR API KEY HERE"
-openAI_api_key = os.environ.get("OPENAI_API_KEY")
 # https://czechgames.com/files/rules/codenames-rules-en.pdf
 # Codemaster = Spymaster, Guesser = Field Operative
 game_rules = """
@@ -36,19 +33,26 @@ You select the assassin tile -- you lose
 """
 
 
-class GPT:
+class Phi4:
 
     def __init__(self, system_prompt, version):
         super().__init__()
-        self.model_version = "o3-mini"
-        self.client = OpenAI(api_key=openAI_api_key)
+        version = "microsoft/Phi-4-reasoning-plus"
+        self.model_version = version 
+        self.tokenizer = AutoTokenizer.from_pretrained(version)
+        self.model = AutoModelForCausalLM.from_pretrained(version, device_map="auto", torch_dtype="auto")
+       
         self.conversation_history = [{"role": "system", "content": system_prompt}]
 
     def talk_to_ai(self, prompt):
         self.conversation_history.append({"role": "user", "content": prompt})
-        response = self.client.chat.completions.create(
-            messages=self.conversation_history,
-            model=self.model_version,
-        ).choices[0].message.content
+        inputs = self.tokenizer.apply_chat_template(self.conversation_history, tokenize=True, add_generation_prompt=True, return_tensors="pt")
+        outputs = self.model.generate(inputs.to(self.model.device),
+                                 max_new_tokens=4096,
+                                 temperature=0.8,
+                                 top_k=50,
+                                 top_p=0.95,
+                                 do_sample=True,)
+        response = self.tokenizer.decode(outputs[0])
         self.conversation_history.append({"role": "assistant", "content": response})
         return response

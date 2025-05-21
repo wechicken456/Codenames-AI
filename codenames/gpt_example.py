@@ -1,7 +1,9 @@
 import json
 from game import Game
-from players.codemaster_GPT import AICodemaster
-from players.guesser_GPT import AIGuesser
+from players.codemaster_GPT import AICodemaster as RedCodemaster
+from players.guesser_GPT import AIGuesser as RedGuesser
+from players.codemaster_example import AICodemaster as BlueCodemaster
+from players.guesser_example import AIGuesser as BlueGuesser
 from time import time
 
 def simpleExample(single_team):
@@ -12,7 +14,7 @@ def simpleExample(single_team):
     seed = time()
 
     print("starting GPT game")
-    Game(AICodemaster, AIGuesser, AICodemaster, AIGuesser, seed=seed, do_print=True, game_name="GPT-GPT", single_team=single_team).run()
+    Game(RedCodemaster, RedGuesser, BlueCodemaster, BlueGuesser, seed="1337", do_print=True, game_name="GPT-Sample", single_team=single_team).run()
 
     # display the results
     print(f"\nfor seed {seed} ~")
@@ -28,4 +30,4 @@ def simpleExample(single_team):
 
 if __name__ == "__main__":
     simpleExample(False)    # Two Teams Track
-    simpleExample(True)     # Single Team Track
+    #simpleExample(True)     # Single Team Track
