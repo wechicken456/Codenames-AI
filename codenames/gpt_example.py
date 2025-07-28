@@ -14,7 +14,7 @@ def simpleExample(single_team):
     seed = time()
 
     print("starting GPT game")
-    Game(RedCodemaster, RedGuesser, BlueCodemaster, BlueGuesser, seed="1337", do_print=True, game_name="GPT-Sample", single_team=single_team).run()
+    Game(RedCodemaster, RedGuesser, BlueCodemaster, BlueGuesser, seed="9876", do_print=True, game_name="GPT-Sample", single_team=single_team).run()
 
     # display the results
     print(f"\nfor seed {seed} ~")
