@@ -1,0 +1,12 @@
+[+] Using device: cuda
+[-] Loading dataset...
+Dataset({
+    features: ['id', 'url', 'title', 'raw_mediawiki', 'text'],
+    num_rows: 1700000
+})
+[+] Finished loading dataset. Time taken: 2.483621120452881
+[-] Splitting into sentences...
+[+] Done splitting into sentences
+[-] Saving cleaned dataset to disk...
+Total time taken: 6164.19s
+
