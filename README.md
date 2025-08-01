@@ -6,10 +6,10 @@ An AI system for playing Codenames that combines multiple language understanding
 
 # Directory structure
 
-[conceptnet](./conceptnet/): All functions related to querying ConceptNet API. Doesn't rank any words as it's the Codemaster.
-[preprocess](./preprocess/): Clean the huggingface wikipedia dump dataset.
-[embs](./embs/): All the `embs*.py` files are used to train on different chunks of the cleaned wikipedia dataset. They're run concurrently on a SLURM cluster. `combine_embs.py` is used to combine all the embeddings across different chunks together.
-[codenames](./codenames/): contains some files that are prototypes of the codemaster/guesser. The rest is in the same directory structure as described in the original repo or in the [GAME.md](./GAME.md) file.
+- [conceptnet](./conceptnet/): All functions related to querying ConceptNet API. Doesn't rank any words as it's the Codemaster.
+- [preprocess](./preprocess/): Clean the huggingface wikipedia dump dataset.
+- [embs](./embs/): All the `embs*.py` files are used to train on different chunks of the cleaned wikipedia dataset. They're run concurrently on a SLURM cluster. `combine_embs.py` is used to combine all the embeddings across different chunks together.
+- [codenames](./codenames/): contains some files that are prototypes of the codemaster/guesser. The rest is in the same directory structure as described in the original repo or in the [GAME.md](./GAME.md) file.
 [datasets](./datasets/): contain miscallaneous datasets.
 
 
