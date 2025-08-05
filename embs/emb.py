@@ -33,7 +33,7 @@
 # !pip uninstall -y flash-attn
 
 
-# In[20]:
+# In[3]:
 
 
 from annoy import AnnoyIndex
@@ -76,7 +76,7 @@ print("[+] Finished loading embedding model...")
 print(f"[+] Model using device: {model.device}, dtype: {model.dtype}")
 
 
-# In[19]:
+# In[2]:
 
 
 stopwords = set([
@@ -90,7 +90,7 @@ idx = 0
 word_to_idx_dict = dict()
 bank_idx = 1
 emb_size = 768
-debug = True
+debug = False
 
 def last_token_pool(last_hidden_states: torch.Tensor,
                  attention_mask: torch.Tensor) -> torch.Tensor:

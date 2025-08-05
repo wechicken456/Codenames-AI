@@ -1,7 +1,8 @@
 .env
-dataset.zip
+glove/
+**/*.zip
 *.csv
-annoy
+**/annoy_index/
 __pycache__/
 **/.ipynb_checkpoints/
 **/__pycache__/

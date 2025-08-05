@@ -95,9 +95,9 @@ clue1, clue2, clue3
                 history = self.get_move_history()
                 for move in history:
                     if "Codemaster" in move[0]:
-                        move_history += move[0] + " gives clue " + move[1] + ", " + str(move[2])
+                        move_history += move[0] + " gives the clue (" + move[1] + ", " + str(move[2]) + ")"
                     else:
-                        move_history += move[0] + " gives guess the " + move[2] + " word " + move[1] + " and decided to "
+                        move_history += move[0] + " guesses the " + move[2] + " word " + move[1] + " and decided to "
                         if move[3] == True:
                             move_history += "keep guessing"
                         else:

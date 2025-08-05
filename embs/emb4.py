@@ -238,7 +238,7 @@ def create_embeddings(script_id : int):
     else:
         shuffled_dataset = dataset.shuffle(seed=42)["paragraph"][5_250_000:7_000_000]
         truncated_dataset = Dataset.from_dict({"paragraph": shuffled_dataset})
-        truncated_dataset.map(process_batch, batched=True, batch_size=64)
+        truncated_dataset.map(process_batch, batched=True, batch_size=16)
 
     print("Number of embeddings", len(embedding_vector_averages))
     print("Number of words in word_to_idx_dict", len(word_to_idx_dict.keys()))
