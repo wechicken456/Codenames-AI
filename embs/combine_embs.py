@@ -24,98 +24,101 @@ device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
 
 import numpy as np
+import pickle
 from annoy import AnnoyIndex
-from collections import defaultdict
 import os
 
-# --- Configuration ---
-# Set this to the number of script outputs you have
-NUM_CHUNKS = 2  # e.g., if you have files ending in test1, test2, ... test5
 EMB_SIZE = 768
-METRIC = 'angular' # Must match the metric used to create the original indices
+NUM_CHUNKS = 16
+METRIC = 'angular'
 
-# --- File Naming Convention ---
-# Assumes your files are named like this. Change if necessary.
-ann_filename_template = "annoy/annoy_tree_qwen_emb_768_test{}.ann"
-dict_filename_template = "annoy/annoy_tree_index_to_word_qwen_emb_768_test{}.npy"
-
-def combine_indices(num_chunks: int):
+def combine_embeddings(num_chunks: int):
     """
-    Loads embeddings from multiple Annoy indices and prepares them for averaging.
+    Combines embedding data from multiple chunks into a single,
+    globally-averaged set of embeddings.
     """
-    # This dictionary will collect all embeddings for each word.
-    # e.g., { "word": [emb_from_chunk1, emb_from_chunk3], ... }
-    word_embeddings_collection = defaultdict(list)
+    # This dictionary will store the final combined data:
+    # { "word": (running_average_embedding, total_count) }
+    combined_data = {}
 
     print(f"[*] Starting combination process for {num_chunks} chunks...")
 
     for i in range(1, num_chunks + 1):
-        ann_file = ann_filename_template.format(i)
-        dict_file = dict_filename_template.format(i)
+        prefix = f"chunk_{i}"
 
-        # Check if files for the chunk exist
-        if not os.path.exists(ann_file) or not os.path.exists(dict_file):
-            print(f"[!] Warning: Data for chunk {i} not found (missing {ann_file} or {dict_file}). Skipping.")
+        if not os.path.exists(f"{prefix}_embeddings.npy"):
+            print(f"[!] Warning: Data for chunk {i} not found. Skipping.")
             continue
 
         print(f"--- Processing Chunk {i} ---")
 
-        # Load the Annoy index
-        index = AnnoyIndex(EMB_SIZE, metric=METRIC)
-        index.load(ann_file)
+        chunk_embeddings = np.load(f"{prefix}_embeddings.npy")
+        chunk_counts = np.load(f"{prefix}_counts.npy")
+        with open(f"{prefix}_word_to_idx.pkl", "rb") as f:
+            chunk_word_to_idx = pickle.load(f)
 
-        # Load the index-to-word dictionary
-        idx_to_word = np.load(dict_file, allow_pickle=True).item()
+        for word, idx in chunk_word_to_idx.items():
+            chunk_emb = chunk_embeddings[idx]
+            chunk_count = chunk_counts[idx]
 
-        # Extract each word and its vector
-        for idx, word in idx_to_word.items():
-            vector = index.get_item_vector(idx)
-            word_embeddings_collection[word].append(vector)
+            # Check if the incoming embedding from the chunk is valid.
+            # If it's not, we skip it to prevent corrupting the final average.
+            if np.isnan(chunk_emb).any():
+                print(f"[!] Warning: NaN found for word '{word}'. Skipping...")
+                continue 
 
-    print("\n[+] Data collection complete. All chunks processed.")
-    return word_embeddings_collection
+            # If we've seen this word before, perform a weighted average
+            if word in combined_data:
+                total_emb, total_count = combined_data[word]
 
-def average_and_build_index(collection: dict):
+                # New average = ( (old_avg * old_count) + (new_avg * new_count) ) / (old_count + new_count)
+                new_total_count = total_count + chunk_count
+
+                new_avg_emb = np.average(
+                    [total_emb, chunk_emb], 
+                    axis=0, 
+                    weights=[total_count, chunk_count]
+                )
+
+                combined_data[word] = (new_avg_emb, new_total_count)
+
+            else:
+                combined_data[word] = (chunk_emb, chunk_count)
+
+    print("\n[+] Combination complete. All chunks merged.")
+    return combined_data
+
+def build_final_annoy_index(combined_data: dict):
     """
-    Averages the collected embeddings and builds the final Annoy index.
+    Builds and saves a final Annoy index from the combined data.
     """
-    print("[*] Averaging embeddings and building final index...")
+    print("[*] Building final Annoy index...")
 
-    final_annoy_index = AnnoyIndex(EMB_SIZE, metric=METRIC)
+    t = AnnoyIndex(EMB_SIZE, metric=METRIC)
     final_idx_to_word = {}
-    item_idx = 0
 
-    # Iterate through each word and its list of embeddings
-    for word, embeddings_list in collection.items():
-        # Calculate the mean of all embeddings for this word
-        if embeddings_list:
-            final_embedding = np.mean(embeddings_list, axis=0)
+    for i, (word, (embedding, count)) in enumerate(combined_data.items()):
+        if len(embedding) == EMB_SIZE:
+            t.add_item(i, embedding)
+            final_idx_to_word[i] = word
 
-            final_annoy_index.add_item(item_idx, final_embedding)
-            final_idx_to_word[item_idx] = word
-            item_idx += 1
+    print(f"Building Annoy tree with {t.get_n_items()} items...")
+    t.build(200, n_jobs=-1) # Build with 100 trees
 
-    print(f"Building final Annoy tree with {final_annoy_index.get_n_items()} unique words...")
-    final_annoy_index.build(100, n_jobs=-1) # Build with 100 trees
-
-    # Save the final combined index and word map
-    final_annoy_index.save('final_combined.ann')
+    # Save the final index and the word mapping
+    t.save('final_combined.ann')
     np.save('final_combined_idx_to_word.npy', final_idx_to_word)
 
-    print("\n[+] Success! Final combined index saved.")
+    print("[+] Annoy index and word map created and saved successfully!")
     print("Files: 'final_combined.ann' and 'final_combined_idx_to_word.npy'")
 
 if __name__ == "__main__":
-    # 1. Collect all embeddings from all files
-    embeddings_collection = combine_indices(NUM_CHUNKS)
+    start = time.time()
+    final_data = combine_embeddings(NUM_CHUNKS)
+    if final_data:
+        build_final_annoy_index(final_data)
 
-    # 2. Average them and build the new index
-    if embeddings_collection:
-        average_and_build_index(embeddings_collection)
-    else:
-        print("[!] No data was found to process. Please check your file paths and NUM_CHUNKS.")
-
-
+    print(f"Time taken: {time.time() - start}")
 
 
 # In[ ]:

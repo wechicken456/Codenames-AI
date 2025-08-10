@@ -176,7 +176,7 @@ class LLM:
         history = [{"role": "user", "content": prompt}]
         response = await self.client.chat.completions.create(
             messages=history,
-            model="gpt-4.1",
+            model="gpt-5-mini",
             response_format={ "type": "json_object" }
         )
         return target_word, self.extract_clues_from_LLM_response(response.choices[0].message.content)

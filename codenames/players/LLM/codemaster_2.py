@@ -90,10 +90,11 @@ class LLM2:
         ## OBJECTIVE
         Given the list of target words: [{words_str}], generate **up to 5 distinct one-word clues** that are **strongly related to ALL of the target words**. 
         Each clue should be:
-        - A **single English word** (no phrases, plurals, names, or proper nouns).
-        - Strongly and clearly semantically related to **all the target words**. Don't try to be too clever - directness is more important. The clearer the clue, the better.
+        - A **single English word** (no phrases).
+        - Strongly and clearly semantically related to **all the target words**. Don't try to be clever - directness is more important.
+        - Very direct to **all of the target words**. If a clue is indirect to even only 1 of the target words, then it is a bad clue.
         - **Safe**, meaning the clue must NOT in anyway relate to the dangerous word "{assassin_word}".
-        - Think like a human: Your reasoning for choosing each clue must connect strongly to commonsense English knowledge such that an average college graduate (no specific major) can understand it - no extremely niche references (very common topics are allowed).
+        - Think like a human: Your reasoning for choosing each clue must connect strongly to commonsense English knowledge such that an average person can understand it - no extremely niche references.
 
         ## IMPORTANT: Be as quick as you can.
 
@@ -134,7 +135,7 @@ class LLM2:
         history = [{"role": "user", "content": prompt}]
         response = await self.client.chat.completions.create(
             messages=history,
-            model="gpt-4.1",
+            model="gpt-5-mini",
             response_format={ "type": "json_object" }
         )
         json_res = self.LLM_response_to_JSON(response.choices[0].message.content)

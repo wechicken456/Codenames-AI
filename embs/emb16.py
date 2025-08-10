@@ -68,7 +68,7 @@ nlp = spacy.load("en_core_web_trf", disable=["parser"])
 
 
 print("[-] Loading embedding model...")
-model_name = "Qwen/Qwen3-Embedding-8B"
+model_name = "Qwen/Qwen3-Embedding-4B"
 tokenizer = AutoTokenizer.from_pretrained(model_name, padding_side='left')
 model = AutoModel.from_pretrained(model_name, device_map="auto", torch_dtype=torch.float16)
 nlp.add_pipe('sentencizer')
@@ -197,6 +197,11 @@ def add_emb_batch(paragraphs):
                 embedding = paragraph_embeddings[word_tokens_indices]
                 embedding = F.normalize(embedding, p = 2, dim = -1)
                 embedding = embedding.mean(dim=0)  # shape: (emb_size,)
+
+                if torch.isnan(embedding).any():
+                    if debug:
+                        print(f"[!] Warning: NaN embedding created for word '{word}'. Skipping.")
+                    continue
 
                 # First time we've seen this word
                 if word not in word_to_idx_dict:

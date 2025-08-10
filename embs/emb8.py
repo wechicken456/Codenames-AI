@@ -68,7 +68,7 @@ nlp = spacy.load("en_core_web_trf", disable=["parser"])
 
 
 print("[-] Loading embedding model...")
-model_name = "Qwen/Qwen3-Embedding-8B"
+model_name = "Qwen/Qwen3-Embedding-4B"
 tokenizer = AutoTokenizer.from_pretrained(model_name, padding_side='left')
 model = AutoModel.from_pretrained(model_name, device_map="auto", torch_dtype=torch.float16)
 nlp.add_pipe('sentencizer')
@@ -198,6 +198,11 @@ def add_emb_batch(paragraphs):
                 embedding = F.normalize(embedding, p = 2, dim = -1)
                 embedding = embedding.mean(dim=0)  # shape: (emb_size,)
 
+                if torch.isnan(embedding).any():
+                    if debug:
+                        print(f"[!] Warning: NaN embedding created for word '{word}'. Skipping.")
+                    continue
+
                 # First time we've seen this word
                 if word not in word_to_idx_dict:
                     word_to_idx_dict[word] = idx
@@ -236,7 +241,7 @@ def create_embeddings(script_id : int):
         print("[+] Done splitting into paragraphs")
         subset.map(process_batch, batched=True, batch_size=32)    
     else:
-        shuffled_dataset = dataset.shuffle(seed=42)["paragraph"][12_250_000:14_000_000]
+        shuffled_dataset = dataset.shuffle(seed=42)["paragraph"][10500000:12000000]
         truncated_dataset = Dataset.from_dict({"paragraph": shuffled_dataset})
         truncated_dataset.map(process_batch, batched=True, batch_size=16)
 

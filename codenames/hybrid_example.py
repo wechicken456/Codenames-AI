@@ -1,7 +1,7 @@
 import json
 from game import Game
 from players.hybrid_codemaster import AICodemaster as RedCodemaster
-from players.guesser_example import AIGuesser as RedGuesser
+from players.hybrid_guesser import AIGuesser as RedGuesser
 from players.codemaster_example import AICodemaster as BlueCodemaster
 from players.guesser_example import AIGuesser as BlueGuesser
 from time import time

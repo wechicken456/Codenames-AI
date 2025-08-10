@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # coding: utf-8
 
-# In[9]:
+# In[2]:
 
 
 import sys
@@ -18,7 +18,7 @@ from .codemaster import Codemaster
 from .LLM.codemaster import LLM
 from .LLM.codemaster_2 import LLM2
 from .conceptnet.conceptnet import ConceptNet
-from .annoy_index.annoy import Annoy
+from .annoy_index.annoy_index import Annoy
 
 from nltk.stem import WordNetLemmatizer
 import lemminflect
@@ -29,7 +29,7 @@ from itertools import combinations
 from sklearn.metrics.pairwise import cosine_similarity
 
 
-# In[6]:
+# In[3]:
 
 
 load_dotenv()
@@ -143,7 +143,7 @@ Pick **only the best clue**. Response only with a json object containing only th
     return system_prompt
 
 
-# In[12]:
+# In[1]:
 
 
 class GPTManager():
@@ -155,7 +155,7 @@ class GPTManager():
         self.llm_conversation_history.append({"role": "user", "content": prompt})
         response = self.openai_client.chat.completions.create(
             messages=self.llm_conversation_history,
-            model="gpt-4.1",
+            model="gpt-5-mini",
             response_format={ "type": "json_object" }
         )
         response = response.choices[0].message.content
@@ -184,7 +184,7 @@ class AICodemaster(Codemaster):
         self.safe_clue_numbers = [1,2]
         self.neutral_clue_numbers = [2]
         self.catchup_clue_numbers = [2,3,4]
-        self.equal_clue_numbers = [2,3]
+        self.equal_clue_numbers = [1,2,3]
         self.ignore_clue_score = -500.0
 
     def set_game_state(self, words, maps):
@@ -205,9 +205,10 @@ class AICodemaster(Codemaster):
                 self.lemmas.update(get_all_possible_lemmas(word))
 
         else: 
-            self.update_game_state()
             self.words = words
             self.maps = maps
+            self.update_game_state()
+
 
     def update_game_state(self):
         red, blue, civilian, assassin = self.get_remaining_options()
@@ -307,7 +308,7 @@ class AICodemaster(Codemaster):
             return self.equal_clue_numbers
 
     def average_pairwise_similarity(self, words):
-        if len(words) == 1:
+        if len(words) < 2:
             return 1.0 
 
         embeddings = self.emb.encode(words)
@@ -323,21 +324,74 @@ class AICodemaster(Codemaster):
         return self.average_pairwise_similarity(subset) >= threshold
 
     def score_clue(self, clue: str, subset: list[str]) -> float:
-        clue_emb = self.emb.encode([clue])[0]
-        target_embs = self.emb.encode(subset)
-        enemy_embs = self.emb.encode(self.enemy_words)
-        assassin_emb = self.emb.encode([self.assassin_word])[0]
-        assassin_sim = cosine_similarity([clue_emb], [assassin_emb])[0][0]
-        target_sims = [cosine_similarity([clue_emb], [e])[0][0] for e in target_embs]
+        """
+        Score a clue against a subset of target words, enemy words, and assassin word.
+        1.  the clue is immediately discarded if it is more similar to the assassin or the top enemy word than it is to its weakest target word. Return self.ignore_clue_score
+        2.  Positive Score: Calculated from a weighted sum of the clue's:
+            - Average similarity to all target words (for overall strength).
+            - Minimum similarity to any target word (to reward consistency and
+              penalize high variance, ensuring the clue works for all words).
+        3.  Penalty Score: A weighted penalty based on the clue's similarity to the most dangerous non-target words:
+            - The single *most similar* enemy word.
+            - The single *most similar* civilian word.
+            - The assassin word (very high penalty).    
+        4.  Subset Size Bonus: A small logarithmic bonus is added for clues
+            that target more words, giving diminishing returns for larger groups.
 
-        # ignore clue if it is more similar to assassin than to any target word
-        if any(assassin_sim >= sim for sim in target_sims):
+        """
+        W_AVG_TARGET = 0.6
+        W_MIN_TARGET = 0.4
+        W_ENEMY_MAX = 0.5
+        W_CIVILIAN_MAX = 0.3
+        W_ASSASSIN = 2
+        print(f"scoring clue {clue} against subset {subset}")
+        clue_emb = self.emb.encode([clue])[0]
+
+        target_embs = self.emb.encode(subset)
+        print("clue_emb: ", clue_emb)
+        print("target_embs: ", target_embs)
+        target_sims = cosine_similarity([clue_emb], target_embs)[0]
+
+        enemy_sims = np.array([])
+        if self.enemy_words:
+            enemy_embs = self.emb.encode(self.enemy_words)
+            enemy_sims = cosine_similarity([clue_emb], enemy_embs)[0]
+
+        civilian_sims = np.array([])
+        if self.civilian_words:
+            civilian_embs = self.emb.encode(self.civilian_words)
+            civilian_sims = cosine_similarity([clue_emb], civilian_embs)[0]
+
+        assassin_sim = 0.0
+        if self.assassin_word:
+            assassin_emb = self.emb.encode([self.assassin_word])[0]
+            assassin_sim = cosine_similarity([clue_emb], [assassin_emb])[0][0]
+
+        min_target_sim = np.min(target_sims)
+        max_enemy_sim = np.max(enemy_sims) if enemy_sims.size > 0 else 0.0
+
+        if assassin_sim + 0.1 >= min_target_sim or assassin_sim > 0.35:
             return self.ignore_clue_score
 
-        enemy_sims = [cosine_similarity([clue_emb], [e])[0][0] for e in enemy_embs]
-        score = sum(target_sims) - sum(enemy_sims)
-        return score
+        if max_enemy_sim + 0.1 >= min_target_sim:
+            return self.ignore_clue_score
 
+        avg_target_sim = np.mean(target_sims)
+        positive_score = (W_AVG_TARGET * avg_target_sim) + (W_MIN_TARGET * min_target_sim)
+
+        max_civilian_sim = np.max(civilian_sims) if civilian_sims.size > 0 else 0.0
+
+        penalty_score = (W_ENEMY_MAX * max_enemy_sim) + \
+                        (W_CIVILIAN_MAX * max_civilian_sim) + \
+                        (W_ASSASSIN * assassin_sim)
+
+        final_score = positive_score - penalty_score
+
+        # larger subsets will have diminishing returns
+        score_boost = 0.1 * np.log(len(subset)) if len(subset) > 1 else 0
+        final_score += score_boost
+
+        return final_score
 
     async def _get_clues_for_subset(self, subset: list[str]):
         """
@@ -376,11 +430,13 @@ class AICodemaster(Codemaster):
         for size in subset_sizes:
             for subset in combinations(self.our_words, size):
                 score = self.average_pairwise_similarity(subset)
-                if score >= 0.5:
+                if score >= 0.4:
                     subset_scores.append((score, subset))
 
         # Sort by cohesion score descending
-        top_subsets = sorted(subset_scores, key=lambda x: x[0], reverse=True)[:10]
+        top_subsets = sorted(subset_scores, key=lambda x: x[0], reverse=True)[:8]
+        if len(top_subsets) == 0:
+            top_subsets = [(1.0, [word]) for word in self.our_words]
 
         async def gather_all():
             tasks = [self._get_clues_for_subset(subset) for _, subset in top_subsets]
@@ -411,6 +467,8 @@ class AICodemaster(Codemaster):
             resp = json.loads(resp)
             return resp
         except:
+            if debug:
+                print("[!] parse_LLM_choice: Invalid LLM response")
             return {}
 
     def parse_LLM_choice(self, obj: dict) -> int:
@@ -421,6 +479,8 @@ class AICodemaster(Codemaster):
         try:
             return int(obj["choice"])
         except:
+            if debug:
+                print("[!] parse_LLM_choice: Invalid LLM choice")
             return 0
 
     def get_clue(self):

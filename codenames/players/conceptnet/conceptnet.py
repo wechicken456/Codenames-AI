@@ -309,7 +309,7 @@ class ConceptNet:
 
         # Get the list of set of candidate clues for each target word
         try:
-            candidate_sets = [set(self.clue_candidates[word]) for word in target_words]
+            candidate_sets = [set(self.clue_candidates[word.lower()]) for word in target_words]
         except KeyError:
             return set() # A target word might have no valid clues
 
