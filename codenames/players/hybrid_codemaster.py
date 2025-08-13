@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # coding: utf-8
 
-# In[2]:
+# In[5]:
 
 
 import sys
@@ -17,6 +17,7 @@ from nltk.corpus import wordnet as wn
 from .codemaster import Codemaster
 from .LLM.codemaster import LLM
 from .LLM.codemaster_2 import LLM2
+from .LLM.codemaster_backup import LLMBackup
 from .conceptnet.conceptnet import ConceptNet
 from .annoy_index.annoy_index import Annoy
 
@@ -29,7 +30,7 @@ from itertools import combinations
 from sklearn.metrics.pairwise import cosine_similarity
 
 
-# In[3]:
+# In[6]:
 
 
 load_dotenv()
@@ -37,7 +38,7 @@ openai_api_key = os.environ.get("OPENAI_API_KEY")
 nlp = spacy.load("en_core_web_trf")
 
 
-# In[4]:
+# In[7]:
 
 
 debug = True
@@ -105,7 +106,7 @@ The clues are listed in no particular order.
 
 """
 
-    for i, (score, clue, subset) in enumerate(clue_candidates):
+    for i, (clue, subset) in enumerate(clue_candidates):
         system_prompt += f"{i+1}. Clue: \"{clue}\" — Targets: {subset} — Number of targets: {len(subset)}\n"
 
     system_prompt += f"""
@@ -143,7 +144,7 @@ Pick **only the best clue**. Response only with a json object containing only th
     return system_prompt
 
 
-# In[1]:
+# In[9]:
 
 
 class GPTManager():
@@ -155,7 +156,7 @@ class GPTManager():
         self.llm_conversation_history.append({"role": "user", "content": prompt})
         response = self.openai_client.chat.completions.create(
             messages=self.llm_conversation_history,
-            model="gpt-5-mini",
+            model="gpt-4.1",
             response_format={ "type": "json_object" }
         )
         response = response.choices[0].message.content
@@ -173,6 +174,7 @@ class AICodemaster(Codemaster):
         annoy_path = os.path.join(cwd, "annoy_index")
         self.emb = Annoy(annoy_path=annoy_path)
         self.gpt_manager = GPTManager(api_key=openai_api_key)
+        self.llm_backup = LLMBackup(openAI_api_key=openai_api_key)
         self.team = team
         self.words = []
         self.maps = []
@@ -268,11 +270,26 @@ class AICodemaster(Codemaster):
         """
         return true if a word is NOT a lemma or inflection of any word on the board.
         """
-        doc = nlp(word)
+
+        def has_long_common_substring(a: str, b: str, min_len: int = 5) -> bool:
+            a, b = a.lower(), b.lower()
+            len_a, len_b = len(a), len(b)
+            for i in range(len_a):
+                for j in range(len_b):
+                    match_len = 0
+                    while (i + match_len < len_a) and (j + match_len < len_b) and a[i + match_len] == b[j + match_len]:
+                        match_len += 1
+                        if match_len >= min_len:
+                            return True
+            return False
+
+        doc = nlp(word.lower())
         for token in doc:
-            if (token.pos_ in allowed_word_types) and (token.lemma_ not in self.lemmas) and (token.text not in self.lemmas):
-                return True
-        return False
+            for lemma in self.lemmas:
+                if (token.pos_ not in allowed_word_types) or (token.lemma_ == lemma) or (token.text == lemma) or (lemma in token.text) or (token.text in lemma) or (has_long_common_substring(token.text, lemma)):
+                    return False
+
+        return True
 
     def get_subset_sizes(self):
         """
@@ -293,13 +310,13 @@ class AICodemaster(Codemaster):
             our_rem = 8 - our_count
             enemy_count = self.words.count("*Red*")
             enemy_rem = 9 - enemy_count
-        diff = our_count - enemy_count
+        diff = our_rem - enemy_rem
         if our_rem == 1:
             return [1]
 
-        if diff <= -1:
+        if diff >= 1:
             return self.catchup_clue_numbers
-        elif diff >= 1:
+        elif diff < 0:
             if our_rem <= 2:
                 return self.safe_clue_numbers
             else:
@@ -344,12 +361,12 @@ class AICodemaster(Codemaster):
         W_ENEMY_MAX = 0.5
         W_CIVILIAN_MAX = 0.3
         W_ASSASSIN = 2
-        print(f"scoring clue {clue} against subset {subset}")
+        #print(f"scoring clue {clue} against subset {subset}")
         clue_emb = self.emb.encode([clue])[0]
 
         target_embs = self.emb.encode(subset)
-        print("clue_emb: ", clue_emb)
-        print("target_embs: ", target_embs)
+        #print("clue_emb: ", clue_emb)
+        #print("target_embs: ", target_embs)
         target_sims = cosine_similarity([clue_emb], target_embs)[0]
 
         enemy_sims = np.array([])
@@ -370,10 +387,13 @@ class AICodemaster(Codemaster):
         min_target_sim = np.min(target_sims)
         max_enemy_sim = np.max(enemy_sims) if enemy_sims.size > 0 else 0.0
 
-        if assassin_sim + 0.1 >= min_target_sim or assassin_sim > 0.35:
+        #print(f"Scoring clue {clue} against subset {subset}:")
+        #print(f"-> min_target_sim: {min_target_sim}, max_enemy_sim: {max_enemy_sim}, assassin_sim: {assassin_sim}\n")
+
+        if assassin_sim + 0.05 >= min_target_sim:
             return self.ignore_clue_score
 
-        if max_enemy_sim + 0.1 >= min_target_sim:
+        if max_enemy_sim + 0.01 >= min_target_sim:
             return self.ignore_clue_score
 
         avg_target_sim = np.mean(target_sims)
@@ -405,6 +425,8 @@ class AICodemaster(Codemaster):
                 llm_individual_clues += clues
         llm_subset_clues = await self.llm_subset_cluemaster.get_clues_for_words(subset, self.assassin_word)
 
+        print(f"[+] LLM generated clues {llm_subset_clues} for subset {subset}\n")
+
         merged = set(conceptnet_clues) | set(llm_individual_clues) | set(llm_subset_clues)
         valid = [c for c in merged if self.is_valid_clue(c)]
 
@@ -430,8 +452,7 @@ class AICodemaster(Codemaster):
         for size in subset_sizes:
             for subset in combinations(self.our_words, size):
                 score = self.average_pairwise_similarity(subset)
-                if score >= 0.4:
-                    subset_scores.append((score, subset))
+                subset_scores.append((score, subset))
 
         # Sort by cohesion score descending
         top_subsets = sorted(subset_scores, key=lambda x: x[0], reverse=True)[:8]
@@ -459,6 +480,9 @@ class AICodemaster(Codemaster):
         if (len(all_clue_data) > 6):
             all_clue_data = all_clue_data[:6]
 
+        # discard the score before returning 
+        all_clue_data = [(tmp[1], tmp[2]) for tmp in all_clue_data]
+        print(f"Top clues: {all_clue_data}")
         # Return in format: (score, clue, subset)
         return all_clue_data
 
@@ -483,35 +507,74 @@ class AICodemaster(Codemaster):
                 print("[!] parse_LLM_choice: Invalid LLM choice")
             return 0
 
+    def get_LLM_backup_clues(self) -> list:
+
+        move_history = ""
+        history = self.get_move_history()
+        for move in history:
+            if "Codemaster" in move[0]:
+                move_history += move[0] + " gives the clue (" + move[1] + ", " + str(move[2]) + ")"
+            else:
+                move_history += move[0] + " guesses the " + move[2] + " word " + move[1] + " and decided to "
+                if move[3] == True:
+                    move_history += "keep guessing"
+                else:
+                    move_history += "STOP guessing"
+            move_history += "\n"
+
+
+        async def gather_all():
+            tasks = [self.llm_backup.get_backup_clue(self.our_words, self.enemy_words, self.civilian_words, self.assassin_word, move_history) for i in range(5)]
+            return await asyncio.gather(*tasks)
+
+        start = time.time()
+        results = sync_wrapper(gather_all())
+        valids = []
+        if debug:
+            print(f"Time taken to get all LLM Backup clues: {time.time() - start}")
+        for res in results:
+            if self.is_valid_clue(res[0]):
+                valids.append(res)
+        return valids
+
     def get_clue(self):
         self.gpt_manager.reset_LLM_conversation_history()
         clues_and_subsets = self.get_clues_for_subsets()
+        if not clues_and_subsets or len(clues_and_subsets) == 0:
+            clues_and_subsets = self.get_LLM_backup_clues()
+        # clues_and_subsets = self.get_LLM_backup_clues()
+
+        if debug:
+            print("Final clues_and_subsets: ", clues_and_subsets)
 
         invalid_timer = 0
         clue = None
         number = None
         red, blue, civilian, assassin = self.get_remaining_options()
+
+        move_history = ""
+        history = self.get_move_history()
+        for move in history:
+            if "Codemaster" in move[0]:
+                move_history += move[0] + " gives the clue (" + move[1] + ", " + str(move[2]) + ")"
+            else:
+                move_history += move[0] + " guesses the " + move[2] + " word " + move[1] + " and decided to "
+                if move[3] == True:
+                    move_history += "keep guessing"
+                else:
+                    move_history += "STOP guessing"
+            move_history += "\n"
+
         prompt = ""
         start = time.time()
         while clue is None or number is None:
             if invalid_timer == 10:
-                clue = "TEST"
+                clue = "PASS"
                 number = 1
                 break
 
             if invalid_timer == 0:
-                move_history = ""
-                history = self.get_move_history()
-                for move in history:
-                    if "Codemaster" in move[0]:
-                        move_history += move[0] + " gives the clue (" + move[1] + ", " + str(move[2]) + ")"
-                    else:
-                        move_history += move[0] + " guesses the " + move[2] + " word " + move[1] + " and decided to "
-                        if move[3] == True:
-                            move_history += "keep guessing"
-                        else:
-                            move_history += "STOP guessing"
-                    move_history += "\n"
+
 
                 prompt = format_llm_selection_prompt(
                 team=self.team,
@@ -538,13 +601,14 @@ class AICodemaster(Codemaster):
                     prompt = "Invalid clue. The clue choice must be the between 1 and the number of subsets provided. Your response must follow the provided JSON output format example."
                     continue
 
-                clue, number = clues_and_subsets[num-1][1].upper(), len(clues_and_subsets[num-1][2])
+                clue, number = clues_and_subsets[num-1][0].upper(), len(clues_and_subsets[num-1][1])
 
             except:
                 invalid_timer += 1
                 prompt = "Invalid clue. The clue choice must be the between 1 and the number of subsets provided. Your response must follow the provided JSON output format example."
                 continue
 
+        print(f"Codemaster giving clue {clue}, {number}")
         return clue, number
 
 
@@ -557,7 +621,48 @@ class AICodemaster(Codemaster):
 # In[ ]:
 
 
+# our_words = [
+#     'STAR',
+#     'MOON',
+#     'MARS',
+#     'ROCKET',
+#     'SATELLITE',
+#     'ENGINE',
+#     'PILOT',
+#     'CAPTAIN',
+#     'GALAXY'
+# ]
 
+# # 8 words for the enemy team
+# enemy_words = [
+#     'JUPITER',
+#     'SHUTTLE',
+#     'STATION',
+#     'ASTRONAUT',
+#     'LIGHT',
+#     'TIME',
+#     'CRATER',
+#     'HELMET'
+# ]
+
+# # 7 neutral civilian words
+# civilian_words = [
+#     'COMET',
+#     'LASER',
+#     'DROID',
+#     'ALIEN',
+#     'WARP',
+#     'UNIVERSE',
+#     'BEAM'
+# ]
+
+# # 1 assassin word
+# assassin_word = 'VACUUM'
+# a = AICodemaster(team = "red")
+# all_words = our_words + enemy_words + civilian_words + assassin_word
+# maps = ["Red"] * len(our_words) + ["Blue"] * len(enemy_words) + ["Civilian"] * len(civilian_words) + ["Assassin"]
+# a.set_game_state(all_words, maps)
+# a.get_LLM_backup_clues()
 
 
 # In[ ]:

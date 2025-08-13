@@ -30,4 +30,4 @@ def simpleExample(single_team):
 
 if __name__ == "__main__":
     simpleExample(False)    # Two Teams Track
-    simpleExample(True)     # Single Team Track
+    #simpleExample(True)     # Single Team Track

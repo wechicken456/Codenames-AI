@@ -6,3 +6,5 @@ glove/
 __pycache__/
 **/.ipynb_checkpoints/
 **/__pycache__/
+**/*.ann
+**/*.npy

@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # coding: utf-8
 
-# In[2]:
+# In[25]:
 
 
 from openai import AsyncOpenAI
@@ -29,7 +29,7 @@ except LookupError:
 
 
 
-# In[55]:
+# In[73]:
 
 
 class LLM2:
@@ -88,31 +88,32 @@ class LLM2:
         You are a linguistic reasoning assistant helping a Codenames AI Codemaster generate smart, safe, and high-utility clues.
 
         ## OBJECTIVE
-        Given the list of target words: [{words_str}], generate **up to 5 distinct one-word clues** that are **strongly related to ALL of the target words**. 
+        Given the list of target words: [{words_str}], generate **up to 3 distinct one-word clues** that are **strongly related to ALL of the target words**. 
         Each clue should be:
-        - A **single English word** (no phrases).
+        - A **single English word** (no phrases or multiword).
         - Strongly and clearly semantically related to **all the target words**. Don't try to be clever - directness is more important.
         - Very direct to **all of the target words**. If a clue is indirect to even only 1 of the target words, then it is a bad clue.
         - **Safe**, meaning the clue must NOT in anyway relate to the dangerous word "{assassin_word}".
-        - Think like a human: Your reasoning for choosing each clue must connect strongly to commonsense English knowledge such that an average person can understand it - no extremely niche references.
-
-        ## IMPORTANT: Be as quick as you can.
+        - Think like a human: Choose clues that connect naturally to everyday English knowledge. An average native English speaker should be able to quickly guess the target words from your clues without relying on obscure or highly specialized references. Avoid assuming the player has any specific background knowledge.        
+        ## IMPORTANT: Be as quick as you can. DO NOT take more than 40 seconds.
 
         ## RULES
         - All clues must be one single English word only.
-        - All example sentences must clearly show a natural connection between the clue and each target word. 
+        - All clues must NOT be contained in or a derived form of any of the target words. E.g. clue "pipeline" is invalid if the target word contains "line".
         - Do not output anything except the JSON object.
+        - You need to come up with 3 distinct clues.
 
         ## Examples
          - Examples of good clues: 
              + clue "animal" for target words ["salmon", "chicken"].
              + clue "superhero" for target words ["batman", "iron"]. Because obviously batman is a superhero, and "ironman" is a superhero.
-             + clue "hogwarts" for the target words ["school", "spell", "lion"].
+             + clue "hogwarts" for the target words ["school", "spell", "lion"]. Because almost everyone knows Harry Potter and Hogwarts.
          - Examples of bad clues:
              + clue "big" for target words ["tower", "london"] and assassin word "stream". Even if you are aiming for the common connection "Tower of big ben in London", the clue "big" is too vague and could potentially lead your guesser to guessing the assassin word "stream" as a stream can also be big.
              + clue "deer" for target words ["buck", "bear", "robin"]. Even though these are all animals, they are not strongly related to each other at all except for "buck" and "deer".  This diverges significantly from how humans often generate and interpret clues for Codenames.
-             + clue "mammal" for target words ["walrus", "bear", "eagle"]. As obviously an eagle is not a mammal. Your clue must strongly relate to ALL of the target words. A much safer and stronger clue is "animal".
              + clue “djedkare” for target words "egypt" and "king". Even though it refers to the name of the ruler of Egypt in the 25thcentury B.C., and therefore connects the words “egypt” and “king", it is so niche that it does not reflect the average person’s knowledge of the English language and is likely to yield random guesses if presented to a human player. 
+             + clue "London" for target words "tube", "crown", and "line". This is because not a single average person who doesn't live in London would know the connections 'I rode the Tube across London during rush hour.' and I transferred on the Piccadilly Line in London to reach the airport.'
+             + clue "Yunnan" for target word "China" is bad, as only a few English-speaking people around the world really know geography of China. "Shanghai" is a much better clue and a much more well-known name.
 
         ## OUTPUT
         Respond only with a valid JSON object in the format:
@@ -121,9 +122,9 @@ class LLM2:
             {{
               "clue": "<one-word clue>",
               "example_sentences": [
-                "<Example using clue with target word 1>",
-                "<Example using clue with target word 2>",
-                "<Example using clue with target word 3>"
+                "<Example using this clue with target word 1>",
+                "<Example using this clue with target word 2>",
+                ...
               ]
             }},
             ...
@@ -135,7 +136,7 @@ class LLM2:
         history = [{"role": "user", "content": prompt}]
         response = await self.client.chat.completions.create(
             messages=history,
-            model="gpt-5-mini",
+            model="gpt-4.1",
             response_format={ "type": "json_object" }
         )
         json_res = self.LLM_response_to_JSON(response.choices[0].message.content)
@@ -157,16 +158,31 @@ class LLM2:
 
 
 
-# In[ ]:
+# In[74]:
 
 
+# load_dotenv()
+# openai_api_key = os.environ.get("OPENAI_API_KEY")
 
 
-
-# In[ ]:
-
+# In[75]:
 
 
+# llm = LLM2(openai_api_key)
+
+
+# In[76]:
+
+
+# start = time.time()
+# res = await llm.get_clues_for_words(["moon", "satellite", "ocean"], "tower")
+# print(f"Time taken: {time.time() - start}")
+
+
+# In[77]:
+
+
+# print(res)
 
 
 # In[ ]:

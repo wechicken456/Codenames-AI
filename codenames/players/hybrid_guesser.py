@@ -49,22 +49,22 @@ You are an expert Codenames player. Your codemaster has given you a clue. Your t
 
 **Game State:**
 - **Clue:** "{clue}"
-- **Number of words to guess:** {num_guesses}
+- **Clue number (number of words to guess):** {num_guesses}
 - **Remaining words on board:** [{words_str}]
 
 **Your Task:**
 1.  Analyze the clue in the context of all the words on the board.
-2.  Identify the {num_guesses} words that are the strongest and most direct targets for the clue "{clue}".
-3.  Consider common knowledge, wordplay, and semantic relationships.
+2.  Identify the {num_guesses} words that are the strongest and most direct targets for the clue "{clue}". Assume that clue was given based on commensense knowledge in the English language. 
+3.  Consider extremely common knowledge, wordplay, and semantic relationships.
 4.  Return your answer as an ordered list, with the most confident guess first.
 
 **Output Format:**
 Respond ONLY with a valid JSON object. The object should contain a single key, "guesses", which holds a list of your chosen words in order.
 
 **Example:**
-If the clue is "ANIMAL 2" and you choose "lion" and "tiger", your output should be:
+If the clue is "ANIMAL 2" and you choose "LION" and "TIGER", your output should be:
 {{
-  "guesses": ["lion", "tiger"]
+  "guesses": ["LION", "TIGER"]
 }}
 
 """
@@ -80,7 +80,7 @@ class GPTManager():
         self.llm_conversation_history.append({"role": "user", "content": prompt})
         response = self.openai_client.chat.completions.create(
             messages=self.llm_conversation_history,
-            model="gpt-5-mini",
+            model="gpt-4.1",
             response_format={ "type": "json_object" }
         )
         response = response.choices[0].message.content
@@ -110,9 +110,9 @@ class AIGuesser(Guesser):
         self.planned_guesses = []
         self.turn_in_progress = False
 
-        self.w_fitness = 0.7
-        self.w_cohesion = 0.3
-        self.CONFIDENCE_THRESHOLD = 0.45 # minimum score for subset to be considered to use as guesses 
+        self.w_fitness = 0.8
+        self.w_cohesion = 0.2
+        self.CONFIDENCE_THRESHOLD = 0.35 # minimum score for subset to be considered to use as guesses 
 
     def set_board(self, words_on_board: list[str]):
         self.board_words = [word.lower() for word in words_on_board]
@@ -121,32 +121,21 @@ class AIGuesser(Guesser):
         self.clue = clue.lower()
         self.num_guesses = num_guesses
         self.turn_in_progress = True
-
-        remaining_words = [word for word in self.board_words if '*' not in word]
-        self._formulate_plan(remaining_words)
+        self.planned_guesses = []
 
     def get_answer(self) -> str:
-        if self.planned_guesses:
-            next_guess = self.planned_guesses.pop(0)
-            if not self.planned_guesses:
-                self.turn_in_progress = False
-            return next_guess.upper()
+        if not self.planned_guesses:
+            remaining_words = [word for word in self.board_words if '*' not in word]
+            self._formulate_plan(remaining_words)
 
-        self.turn_in_progress = False
-        return ""
+        next_guess = self.planned_guesses.pop(0)
+        if not self.planned_guesses:
+            self.turn_in_progress = False
+        print(f"Guesser giving guess {next_guess.upper()}")
+        return next_guess.upper()            
 
     def keep_guessing(self) -> bool:
         return self.turn_in_progress and len(self.planned_guesses) > 0
-
-    def get_answer(self):
-        if self.planned_guesses:
-            next_guess = self.planned_guesses.pop(0)
-            if not self.planned_guesses:
-                self.turn_in_progress = False
-            return next_guess.upper()
-
-        self.turn_in_progress = False
-        return ""
 
     def _score_subset(self, subset: tuple[str], clue_word_sims: dict[str, float]) -> float:
         fitness_score = np.mean([clue_word_sims[word] for word in subset])

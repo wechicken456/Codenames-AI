@@ -39,7 +39,7 @@ allowed_word_types = [
     "VERB"
 ]
 
-NOUN_RELS = ["RelatedTo", "CapableOf", "IsA", "UsedFor", "AtLocation", "HasPrerequisite", "HasProperty", "ReceivesAction", "CreatedBy", "Causes", "HasA", "MadeOf"]
+NOUN_RELS = ["CapableOf", "IsA", "UsedFor", "AtLocation", "HasPrerequisite", "HasProperty", "ReceivesAction", "CreatedBy", "Causes", "HasA", "MadeOf"]
 NOUN_REV_RELS = ["AtLocation", "IsA", "PartOf"]
 VERB_RELS = ["MannerOf", "HasSubevent", "MotivatedByGoal", "IsA", "HasFirstSubevent", "HasLastSubevent"]
 VERB_REV_RELS = ["CapableOf", "MannerOf", "CausesDesire", "UsedFor", "CreatedBy", "ReceivesAction", "HasFirstSubevent"]
@@ -250,7 +250,7 @@ class ConceptNet:
         print("\n--- Building Clue Graph (Depth 1) ---")
         d1_tasks = []
         for word in self.our_words:
-            d1_tasks.append(self._fetch_clues_for_word(word, limit=8))
+            d1_tasks.append(self._fetch_clues_for_word(word, limit=5))
 
         d1_results = await asyncio.gather(*d1_tasks)
 

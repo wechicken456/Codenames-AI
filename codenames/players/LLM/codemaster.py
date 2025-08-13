@@ -97,11 +97,12 @@ class LLM:
         **Instructions:**
         1.  Analyze the target word: **{target_word}**
         2.  Consider its meaning for all following roles: **{pos_str}**.
-        3.  For each part of speech, generate three clear example sentence for each of its applicable relations and reverse relations. Each example must be distinct, use commonsense English knowledge, and has a strong connection to the target word **{target_word}**.
+        3.  For each part of speech, generate three clear example sentence for each of its applicable relations and reverse relations. Each example must be distinct, use commonsense knowledge in the English language, and has a strong connection to the target word **{target_word}**.
         4.  Strictly follow the sentence structure provided for each relation in the "Relation Definitions" section below.
         5.  If a relation is not applicable for the target word, simply skip it.
         7.  Your final response must be a single JSON object with one key, "example_relations". Do not include any other text or explanation. Include the nodes A and B in each relation.
         8.  Your examples must in no way relate to the word '{assassin_word}'.
+        9.  ONLY use English words.
 
         **Relation Definitions (from ConceptNet):**
         """
@@ -111,7 +112,6 @@ class LLM:
             pos_rels += f"""
             ### NOUN Relations (A -> B)
             * **IsA**: A is a subtype or a specific instance of B; every A is a B. This is the hyponym relation. Structure: "The noun {target_word} is a type of [concept]."
-            * **RelatedTo**: A has a general, positive relationship with B. Structure: "The noun {target_word} is related to [concept]."
             * **UsedFor**: A is used for B; the purpose of A is B. Structure: "The noun {target_word} is used for [purpose or action]."
             * **CapableOf**: Something A can typically do is B. Structure: "The noun {target_word} is capable of [action]."
             * **AtLocation**: A can typically be found at B. Structure: "The noun {target_word} is found at/in/on [location]"
@@ -122,7 +122,7 @@ class LLM:
             * **CreatedBy**: B is a process or agent that creates A. Structure: The noun {target_word} is created by [process or person]."
             * **Causes**: A and B are events, and it is typical for A to cause B. Structure: "The noun {target_word} causes [event or state]."
             * **HasPrerequisite**: In order for A to happen, B needs to happen. Structure: "The noun {target_word} has a prerequisite of [concept]."
-            * **AssociatedNames**: B is a well-known name of an entity (person, character, location, book, etc) that is very commonly associated with A. Structure "The name [name] ...".
+            * **AssociatedNames**: B is a well-known name of an entity (person, character, location, book, etc) that is very commonly (according to an average person) associated with A. Structure "The name [name] ...".
 
             ### NOUN Reverse Relations (B -> A)
             * **IsA (Reverse)**: B is a supertype of A; every A is a B. Structure: "[An example] is a type of {target_word}."
@@ -176,7 +176,7 @@ class LLM:
         history = [{"role": "user", "content": prompt}]
         response = await self.client.chat.completions.create(
             messages=history,
-            model="gpt-5-mini",
+            model="gpt-4.1",
             response_format={ "type": "json_object" }
         )
         return target_word, self.extract_clues_from_LLM_response(response.choices[0].message.content)
